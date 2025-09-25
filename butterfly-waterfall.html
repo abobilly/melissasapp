@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Butterflies & Waterfall</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #87CEEB, #98FB98, #87CEFA);
+            position: relative;
+        }
+
+        /* Waterfall Background */
+        .waterfall {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(180deg, 
+                    rgba(255,255,255,0.3) 0%, 
+                    rgba(135,206,235,0.5) 30%, 
+                    rgba(64,164,223,0.7) 60%, 
+                    rgba(30,144,255,0.8) 100%
+                );
+            z-index: 1;
+        }
+
+        .water-stream {
+            position: absolute;
+            background: linear-gradient(180deg, 
+                rgba(255,255,255,0.6) 0%, 
+                rgba(173,216,230,0.8) 50%, 
+                rgba(135,206,235,0.9) 100%);
+            animation: waterFlow 2s ease-in-out infinite;
+            border-radius: 50px;
+            opacity: 0.8;
+        }
+
+        .stream-1 { left: 20%; width: 80px; height: 100%; animation-delay: 0s; }
+        .stream-2 { left: 40%; width: 120px; height: 100%; animation-delay: 0.3s; }
+        .stream-3 { left: 65%; width: 90px; height: 100%; animation-delay: 0.6s; }
+
+        @keyframes waterFlow {
+            0%, 100% { transform: translateY(-5px) scaleX(1); }
+            50% { transform: translateY(5px) scaleX(1.1); }
+        }
+
+        /* Butterfly Styles */
+        .butterfly {
+            position: absolute;
+            width: 40px;
+            height: 30px;
+            z-index: 10;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .butterfly:hover {
+            transform: scale(1.2);
+        }
+
+        .wing {
+            position: absolute;
+            border-radius: 50% 10% 50% 10%;
+            animation: flutter 0.5s ease-in-out infinite alternate;
+        }
+
+        .left-wing {
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 25px;
+            transform-origin: bottom right;
+        }
+
+        .right-wing {
+            right: 0;
+            top: 0;
+            width: 20px;
+            height: 25px;
+            transform-origin: bottom left;
+            animation-delay: 0.1s;
+        }
+
+        .body {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 3px;
+            height: 30px;
+            background: #8B4513;
+            border-radius: 50px;
+            transform: translateX(-50%);
+            z-index: 11;
+        }
+
+        @keyframes flutter {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(45deg); }
+        }
+
+        /* Different butterfly colors */
+        .butterfly-orange .wing {
+            background: radial-gradient(circle at 30% 30%, #FFD700, #FF8C00, #FF4500);
+            box-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
+        }
+
+        .butterfly-blue .wing {
+            background: radial-gradient(circle at 30% 30%, #87CEEB, #4169E1, #0000CD);
+            box-shadow: 0 0 10px rgba(65, 105, 225, 0.5);
+        }
+
+        .butterfly-pink .wing {
+            background: radial-gradient(circle at 30% 30%, #FFB6C1, #FF69B4, #DC143C);
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        .butterfly-purple .wing {
+            background: radial-gradient(circle at 30% 30%, #DDA0DD, #9370DB, #8A2BE2);
+            box-shadow: 0 0 10px rgba(147, 112, 219, 0.5);
+        }
+
+        .butterfly-green .wing {
+            background: radial-gradient(circle at 30% 30%, #98FB98, #32CD32, #228B22);
+            box-shadow: 0 0 10px rgba(50, 205, 50, 0.5);
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) translateX(0px) rotate(0deg); 
+            }
+            25% { 
+                transform: translateY(-20px) translateX(10px) rotate(5deg); 
+            }
+            50% { 
+                transform: translateY(-10px) translateX(-15px) rotate(-3deg); 
+            }
+            75% { 
+                transform: translateY(-25px) translateX(5px) rotate(2deg); 
+            }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Mist effect */
+        .mist {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(0deg, 
+                rgba(255,255,255,0.4) 0%, 
+                rgba(255,255,255,0.1) 50%, 
+                transparent 100%);
+            z-index: 5;
+            animation: mistMove 8s ease-in-out infinite;
+        }
+
+        @keyframes mistMove {
+            0%, 100% { transform: translateX(0px); opacity: 0.4; }
+            50% { transform: translateX(20px); opacity: 0.6; }
+        }
+
+        /* Sparkle effects */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            z-index: 15;
+            animation: sparkleAnim 3s ease-in-out infinite;
+        }
+
+        @keyframes sparkleAnim {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Waterfall Background -->
+    <div class="waterfall">
+        <div class="water-stream stream-1"></div>
+        <div class="water-stream stream-2"></div>
+        <div class="water-stream stream-3"></div>
+    </div>
+
+    <!-- Mist Effect -->
+    <div class="mist"></div>
+
+    <!-- Butterflies will be generated by JavaScript -->
+
+    <script>
+        const colors = ['orange', 'blue', 'pink', 'purple', 'green'];
+        const butterflies = [];
+
+        function createButterfly() {
+            const butterfly = document.createElement('div');
+            butterfly.className = `butterfly butterfly-${colors[Math.floor(Math.random() * colors.length)]} floating`;
+            
+            // Random starting position
+            butterfly.style.left = Math.random() * (window.innerWidth - 40) + 'px';
+            butterfly.style.top = Math.random() * (window.innerHeight - 30) + 'px';
+            
+            // Random animation duration and delay
+            butterfly.style.animationDuration = (4 + Math.random() * 4) + 's';
+            butterfly.style.animationDelay = Math.random() * 2 + 's';
+
+            butterfly.innerHTML = `
+                <div class="wing left-wing"></div>
+                <div class="wing right-wing"></div>
+                <div class="body"></div>
+            `;
+
+            document.body.appendChild(butterfly);
+            butterflies.push(butterfly);
+
+            // Add click interaction
+            butterfly.addEventListener('click', function() {
+                createSparkles(butterfly);
+                // Change color on click
+                const currentColor = butterfly.classList[1];
+                butterfly.classList.remove(currentColor);
+                const newColor = 'butterfly-' + colors[Math.floor(Math.random() * colors.length)];
+                butterfly.classList.add(newColor);
+            });
+
+            return butterfly;
+        }
+
+        function createSparkles(butterfly) {
+            for (let i = 0; i < 6; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                
+                const rect = butterfly.getBoundingClientRect();
+                sparkle.style.left = (rect.left + Math.random() * 40 - 10) + 'px';
+                sparkle.style.top = (rect.top + Math.random() * 30 - 10) + 'px';
+                sparkle.style.animationDelay = (i * 0.1) + 's';
+                
+                document.body.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 3000);
+            }
+        }
+
+        function moveButterfly(butterfly) {
+            const maxX = window.innerWidth - 40;
+            const maxY = window.innerHeight - 30;
+            
+            const newX = Math.random() * maxX;
+            const newY = Math.random() * maxY;
+            
+            butterfly.style.transition = 'all 3s ease-in-out';
+            butterfly.style.left = newX + 'px';
+            butterfly.style.top = newY + 'px';
+        }
+
+        function animateButterflies() {
+            butterflies.forEach(butterfly => {
+                if (Math.random() < 0.3) { // 30% chance to move
+                    moveButterfly(butterfly);
+                }
+            });
+        }
+
+        // Create initial butterflies
+        for (let i = 0; i < 8; i++) {
+            setTimeout(() => {
+                createButterfly();
+            }, i * 500);
+        }
+
+        // Periodically move butterflies
+        setInterval(animateButterflies, 4000);
+
+        // Add new butterfly occasionally
+        setInterval(() => {
+            if (butterflies.length < 12 && Math.random() < 0.5) {
+                createButterfly();
+            }
+        }, 8000);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            butterflies.forEach(butterfly => {
+                const maxX = window.innerWidth - 40;
+                const maxY = window.innerHeight - 30;
+                
+                if (parseInt(butterfly.style.left) > maxX) {
+                    butterfly.style.left = maxX + 'px';
+                }
+                if (parseInt(butterfly.style.top) > maxY) {
+                    butterfly.style.top = maxY + 'px';
+                }
+            });
+        });
+
+        // Add some ambient sparkles
+        setInterval(() => {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = Math.random() * window.innerWidth + 'px';
+            sparkle.style.top = Math.random() * window.innerHeight + 'px';
+            sparkle.style.animationDelay = '0s';
+            
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => {
+                sparkle.remove();
+            }, 3000);
+        }, 2000);
+    </script>
+</body>
+</html>
