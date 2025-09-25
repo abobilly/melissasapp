@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melissa's Butterfly Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #87CEEB, #98FB98);
+            margin: 0;
+            padding: 50px 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            color: #2C3E50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .game-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            color: white;
+            text-decoration: none;
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .description {
+            color: #34495e;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin: 30px 0;
+        }
+        
+        .features {
+            text-align: left;
+            margin: 30px 0;
+        }
+        
+        .features ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .features li {
+            background: rgba(76, 175, 80, 0.1);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .features li::before {
+            content: "🦋 ";
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦋 Melissa's Butterfly Adventure 🦋</h1>
+        
+        <p class="description">
+            Welcome to an enchanting butterfly game with a mysterious twist! 
+            Navigate through a magical waterfall scene while hunting for a special butterfly.
+        </p>
+        
+        <a href="butterfly-waterfall.html" class="game-link">🎮 Play Now!</a>
+        
+        <div class="features">
+            <h3>Game Features:</h3>
+            <ul>
+                <li>Beautiful animated waterfall background</li>
+                <li>Colorful butterflies with realistic wing patterns</li>
+                <li>Timer-based survival gameplay</li>
+                <li>Special fast-moving mystery character</li>
+                <li>Victory celebration with sounds and effects</li>
+                <li>Dramatic lava transformation on win</li>
+            </ul>
+        </div>
+        
+        <div class="description">
+            <strong>How to Play:</strong><br>
+            Keep clicking butterflies to reset your 15-second timer. 
+            Find and click the special golden-glowing character to win and transform the scene!
+        </div>
+    </div>
+</body>
+</html>
