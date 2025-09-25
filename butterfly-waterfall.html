@@ -397,7 +397,7 @@
             }
         }
 
-        /* Aunt photo styling - transparent PNG, wide movement, slightly slower */
+        /* Aunt photo styling - transparent PNG, wide movement, slower */
         .aunt-butterfly {
             width: 100px !important;
             height: 100px !important;
@@ -405,13 +405,14 @@
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
-            /* Removed border-radius since it's already transparent */
-            /* Removed border and background blend effects since PNG is transparent */
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-            animation: wideErraticFloat 1.5s ease-in-out infinite !important;
+            /* No outline or glow to avoid any square edge appearance */
+            outline: none;
+            border: none;
+            box-shadow: none;
+            animation: wideErraticFloat 3s ease-in-out infinite !important;
             z-index: 12 !important;
-            /* Simple glow effect for the transparent PNG */
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+            /* Prevent tap highlight on mobile (which can look like a square) */
+            -webkit-tap-highlight-color: transparent;
         }
 
         .aunt-butterfly dotlottie-wc {
@@ -859,8 +860,8 @@
                 const evilButterfly = butterflies[evilButterflyIndex];
                 evilButterfly.classList.add('aunt-butterfly');
                 
-                // Make aunt move with the slower but wide animation
-                evilButterfly.style.animationDuration = '1.5s';
+                // Make aunt move with a slower but wide animation
+                evilButterfly.style.animationDuration = '3s';
             }
         }
 
