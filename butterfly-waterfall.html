@@ -304,13 +304,37 @@
             background: #45a049;
         }
 
-        /* Evil butterfly subtle hint */
-        .evil-butterfly {
-            filter: brightness(0.9) contrast(1.1);
+        /* Aunt photo styling */
+        .aunt-butterfly {
+            width: 60px !important;
+            height: 60px !important;
+            background-image: url('lisa-barlow-smile.avif');
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            border: 3px solid #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            animation: fastFloat 2s ease-in-out infinite !important;
         }
 
-        .evil-butterfly .wing {
-            animation-duration: 0.4s !important;
+        .aunt-butterfly .wing,
+        .aunt-butterfly .body {
+            display: none !important;
+        }
+
+        @keyframes fastFloat {
+            0%, 100% { 
+                transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
+            }
+            25% { 
+                transform: translateY(-30px) translateX(20px) rotate(15deg) scale(1.1); 
+            }
+            50% { 
+                transform: translateY(-15px) translateX(-25px) rotate(-10deg) scale(0.9); 
+            }
+            75% { 
+                transform: translateY(-35px) translateX(15px) rotate(8deg) scale(1.05); 
+            }
         }
 
         /* Victory image */
@@ -434,7 +458,7 @@
                 const butterflyIndex = butterflies.indexOf(butterfly);
                 
                 if (butterflyIndex === evilButterflyIndex) {
-                    // Clicked the evil butterfly!
+                    // Clicked your aunt!
                     activateEvilMode();
                 } else {
                     // Normal butterfly click
@@ -528,7 +552,7 @@
             const gameOverScreen = document.getElementById('gameOver');
             const gameOverText = document.getElementById('gameOverText');
             
-            gameOverText.textContent = "You didn't click fast enough! The evil butterfly escaped!";
+            gameOverText.textContent = "You didn't click fast enough! Your aunt escaped!";
             gameOverScreen.classList.add('show');
         }
 
@@ -574,7 +598,7 @@
                 const gameOverScreen = document.getElementById('gameOver');
                 const gameOverText = document.getElementById('gameOverText');
                 
-                gameOverText.innerHTML = "🎉 CONGRATULATIONS! 🎉<br/>🔥 You found the EVIL butterfly! 🔥<br/>The waterfall has turned to LAVA!<br/>🏆 VICTORY IS YOURS! 🏆";
+                gameOverText.innerHTML = "🎉 CONGRATULATIONS! 🎉<br/>� You found your AUNT! �<br/>The waterfall has turned to LAVA!<br/>🏆 VICTORY IS YOURS! 🏆";
                 gameOverScreen.classList.add('show');
             }, 2500);
         }
@@ -687,7 +711,11 @@
             if (butterflies.length > 0) {
                 evilButterflyIndex = Math.floor(Math.random() * butterflies.length);
                 const evilButterfly = butterflies[evilButterflyIndex];
-                evilButterfly.classList.add('evil-butterfly');
+                evilButterfly.classList.add('aunt-butterfly');
+                
+                // Make aunt move 3x faster by reducing animation duration
+                const currentDuration = parseFloat(evilButterfly.style.animationDuration) || 6;
+                evilButterfly.style.animationDuration = (currentDuration / 3) + 's';
             }
         }
 
