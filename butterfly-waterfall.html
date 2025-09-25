@@ -428,21 +428,20 @@
             }
         }
 
-        /* Aunt photo styling - larger, faster, transparent background, wide movement */
+        /* Aunt photo styling - transparent PNG, wide movement, slightly slower */
         .aunt-butterfly {
             width: 100px !important;
             height: 100px !important;
-            background-image: url('lisa-barlow-smile.avif');
-            background-size: cover;
+            background-image: url('myaunt.png');
+            background-size: contain;
             background-position: center;
-            border-radius: 50%;
-            /* Removed border and changed box-shadow for transparency effect */
+            background-repeat: no-repeat;
+            /* Removed border-radius since it's already transparent */
+            /* Removed border and background blend effects since PNG is transparent */
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-            animation: wideErraticFloat 1s ease-in-out infinite !important;
+            animation: wideErraticFloat 1.5s ease-in-out infinite !important;
             z-index: 12 !important;
-            /* Transparency effects */
-            background-blend-mode: multiply;
-            backdrop-filter: blur(0.5px);
+            /* Simple glow effect for the transparent PNG */
             filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
         }
 
@@ -893,8 +892,8 @@
                 const evilButterfly = butterflies[evilButterflyIndex];
                 evilButterfly.classList.add('aunt-butterfly');
                 
-                // Make aunt move 6x faster with the new super fast animation
-                evilButterfly.style.animationDuration = '1s';
+                // Make aunt move with the slower but wide animation
+                evilButterfly.style.animationDuration = '1.5s';
             }
         }
 
