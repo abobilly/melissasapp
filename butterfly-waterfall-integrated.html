@@ -79,8 +79,8 @@
 
         /* Aunt photo styling */
         .aunt-butterfly {
-            width: 100px !important;
-            height: 100px !important;
+            width: 130px !important;
+            height: 130px !important;
             background-image: url('myaunt.png');
             background-size: contain;
             background-position: center;
@@ -153,8 +153,15 @@
         }
 
         .cousin:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 15px rgba(255,255,255,0.4);
+            transform: scale(0.9) rotate(-5deg);
+            box-shadow: 0 4px 15px rgba(255,0,0,0.4);
+            filter: brightness(0.8);
+            animation: cousinScared 0.3s ease-in-out infinite;
+        }
+
+        @keyframes cousinScared {
+            0%, 100% { transform: scale(0.9) rotate(-5deg) translateX(0px); }
+            50% { transform: scale(0.85) rotate(-8deg) translateX(-3px); }
         }
 
         @keyframes cousinFloat {
@@ -172,20 +179,23 @@
             }
         }
 
-        /* Gossip bubble styling */
+        /* Cool neon speech bubbles */
         .gossip-bubble {
             position: absolute;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 248, 248, 0.98));
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            border-radius: 20px;
-            padding: 12px 18px;
+            background: linear-gradient(135deg, rgba(64, 224, 208, 0.9), rgba(72, 209, 204, 0.95));
+            border: 2px solid rgba(0, 255, 255, 0.8);
+            border-radius: 25px;
+            padding: 14px 20px;
             font-size: 14px;
             font-weight: 600;
-            color: #2c3e50;
+            color: #ffffff;
             z-index: 100;
-            animation: gossipFloat 3s ease-out forwards;
+            animation: gossipFloat 4s ease-out forwards, neonPulse 2s ease-in-out infinite;
             pointer-events: none;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.1);
+            box-shadow: 
+                0 0 20px rgba(64, 224, 208, 0.5),
+                0 0 40px rgba(64, 224, 208, 0.3),
+                0 8px 32px rgba(0,0,0,0.2);
             font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             -webkit-backdrop-filter: blur(15px);
             backdrop-filter: blur(15px);
@@ -194,6 +204,7 @@
             max-width: 200px;
             line-height: 1.4;
             position: relative;
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
         }
 
         .gossip-bubble::before {
@@ -206,25 +217,82 @@
             height: 0;
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
-            border-top: 10px solid rgba(255, 255, 255, 0.95);
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            border-top: 10px solid rgba(64, 224, 208, 0.9);
+            filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
         }
 
         .gossip-bubble.aunt-quote {
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.95), rgba(255, 215, 0, 0.98));
-            border: 2px solid #d4af37;
-            color: #1a1a1a;
+            background: linear-gradient(135deg, rgba(255, 20, 147, 0.9), rgba(255, 69, 0, 0.95));
+            border: 2px solid rgba(255, 215, 0, 0.9);
+            color: #ffffff;
             font-family: 'Georgia', 'Times New Roman', serif;
             font-size: 16px;
             font-weight: 700;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
-            box-shadow: 0 12px 40px rgba(212,175,55,0.3), 0 6px 20px rgba(212,175,55,0.2);
+            text-shadow: 0 0 15px rgba(255,255,255,0.9);
+            box-shadow: 
+                0 0 25px rgba(255, 20, 147, 0.6),
+                0 0 50px rgba(255, 20, 147, 0.4),
+                0 12px 40px rgba(0,0,0,0.3);
             min-width: 160px;
             max-width: 220px;
+            animation: gossipFloat 6s ease-out forwards, royalPulse 1.5s ease-in-out infinite;
+            z-index: 1000 !important; /* Always on top */
+        }
+
+        .gossip-bubble.aunt-quote.shaking-speech {
+            z-index: 1001 !important; /* Even higher for shaking speech */
+            animation: gossipFloat 8s ease-out forwards, royalPulse 1s ease-in-out infinite, urgentShake 0.2s ease-in-out infinite;
+            border: 3px solid rgba(255, 0, 0, 0.9);
+            box-shadow: 
+                0 0 35px rgba(255, 0, 0, 0.8),
+                0 0 70px rgba(255, 0, 0, 0.6),
+                0 15px 50px rgba(0,0,0,0.4);
+        }
+
+        @keyframes urgentShake {
+            0%, 100% { transform: translateX(0px); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
         }
 
         .gossip-bubble.aunt-quote::before {
-            border-top-color: rgba(212, 175, 55, 0.95);
+            border-top-color: rgba(255, 20, 147, 0.9);
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.7));
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 20px rgba(64, 224, 208, 0.5),
+                    0 0 40px rgba(64, 224, 208, 0.3),
+                    0 8px 32px rgba(0,0,0,0.2);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 30px rgba(64, 224, 208, 0.8),
+                    0 0 60px rgba(64, 224, 208, 0.5),
+                    0 8px 32px rgba(0,0,0,0.2);
+            }
+        }
+
+        @keyframes royalPulse {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 25px rgba(255, 20, 147, 0.6),
+                    0 0 50px rgba(255, 20, 147, 0.4),
+                    0 12px 40px rgba(0,0,0,0.3);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 35px rgba(255, 20, 147, 0.9),
+                    0 0 70px rgba(255, 20, 147, 0.6),
+                    0 12px 40px rgba(0,0,0,0.3);
+            }
+        }
+
+        @keyframes fadeOutFast {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.5); }
         }
 
         @keyframes gossipFloat {
@@ -923,9 +991,34 @@
             bubble.className = 'gossip-bubble';
             
             const isAunt = character.classList && character.classList.contains('aunt-butterfly');
+            const isShakingText = text === "I'm shaking. I'm physically shaking.";
+            
             if (isAunt) {
                 bubble.classList.add('aunt-quote');
                 auntIsSpeaking = true;
+                
+                // Special styling for shaking text
+                if (isShakingText) {
+                    bubble.classList.add('shaking-speech');
+                }
+                
+                // Clear all existing cousin bubbles when aunt speaks
+                const cousinBubbles = document.querySelectorAll('.gossip-bubble:not(.aunt-quote)');
+                cousinBubbles.forEach(cousinBubble => {
+                    if (cousinBubble.parentNode) {
+                        cousinBubble.style.animation = 'fadeOutFast 0.3s ease-out forwards';
+                        setTimeout(() => {
+                            if (cousinBubble.parentNode) {
+                                cousinBubble.parentNode.removeChild(cousinBubble);
+                            }
+                        }, 300);
+                    }
+                });
+            } else {
+                // Don't show cousin bubbles if aunt is speaking
+                if (auntIsSpeaking) {
+                    return;
+                }
             }
             
             bubble.textContent = text;
@@ -955,7 +1048,15 @@
             
             document.body.appendChild(bubble);
             
-            const duration = isAunt ? gameConfig.bubbleDuration * 1000 + 2000 : gameConfig.bubbleDuration * 1000;
+            // Extended duration for shaking speech
+            let duration;
+            if (isShakingText) {
+                duration = gameConfig.bubbleDuration * 1000 + 6000; // Extra long for shaking text
+            } else if (isAunt) {
+                duration = gameConfig.bubbleDuration * 1000 + 3000;
+            } else {
+                duration = gameConfig.bubbleDuration * 1000 + 1000;
+            }
             setTimeout(() => {
                 if (bubble.parentNode) {
                     bubble.parentNode.removeChild(bubble);
@@ -997,8 +1098,19 @@
                 butterfly.style.top = rect.top + 'px';
                 
                 if (cousins.length === 0) {
+                    // Endless mode - spawn more cousins instead of ending
                     setTimeout(() => {
-                        activateEvilMode();
+                        showGlassCard("🎉 WAVE COMPLETE!", "More cousins incoming! The family drama continues...", 2000);
+                        
+                        // Spawn new wave of cousins after 3 seconds
+                        setTimeout(() => {
+                            const newCousinCount = Math.min(gameConfig.cousinCount + 2, 12); // Gradually increase difficulty
+                            for (let i = 0; i < newCousinCount; i++) {
+                                setTimeout(() => {
+                                    createCousin();
+                                }, i * 600);
+                            }
+                        }, 3000);
                     }, 1000);
                 }
                 
@@ -1013,13 +1125,13 @@
                     return;
                 }
                 
-                if (Math.random() < 0.7) {
+                if (Math.random() < 0.9) { // Increased chance from 70% to 90%
                     const mlmQuotes = ["Have you heard of sōl?", "Join my MLM!", "This opportunity won't last forever!", "You could be your own boss!"];
                     const allQuotes = [...mlmQuotes, ...mlmQuotes, ...gameConfig.cousinQuotes];
                     const randomQuote = allQuotes[Math.floor(Math.random() * allQuotes.length)];
                     showGossipBubble(cousin, randomQuote);
                 }
-            }, 2000 + Math.random() * 1500);
+            }, 1500 + Math.random() * 1000); // More frequent cousin speech
             
             cousinQuoteIntervals.push(interval);
         }
@@ -1042,7 +1154,7 @@
                 }
             }, 500);
             
-            // Continuous speech with shorter intervals
+            // Continuous speech with readable timing
             auntQuoteInterval = setInterval(() => {
                 if (evilButterflyIndex === -1 || !isGameActive) return;
                 
@@ -1063,10 +1175,10 @@
                         
                         setTimeout(() => {
                             aunt.classList.remove('shaking');
-                        }, 6000);
-                    }, 2000); // Delay the shaking quote so it doesn't overlap
+                        }, 10000); // Longer shaking duration
+                    }, 3000); // Delay the shaking quote so it doesn't overlap
                 }
-            }, 2500); // Much shorter interval for constant speech
+            }, 4000); // More frequent aunt speech - 4 seconds
         }
 
         function selectEvilButterfly() {
