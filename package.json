@@ -1,20 +1,28 @@
 {
-  "name": "melissa-adventure-dev-tools",
+  "name": "melissas-app",
   "version": "1.0.0",
-  "description": "Development tools for Melissa's Adventure game",
-  "main": "dev-server.js",
+  "description": "Real Housewives Family Drama Simulator with Lit components",
+  "type": "module",
+  "main": "intro-screen.html",
   "scripts": {
-    "dev": "node dev-server.js",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "npx http-server . -p 8080 -c-1",
+    "old-dev": "node dev-server.js",
     "start": "node dev-server.js"
   },
   "dependencies": {
+    "lit": "^3.1.0",
     "express": "^4.18.2",
     "cors": "^2.8.5"
   },
   "devDependencies": {
+    "vite": "^5.0.0",
+    "typescript": "^5.0.0",
     "nodemon": "^3.0.1"
   },
-  "keywords": ["game", "admin", "development"],
-  "author": "Your Name",
+  "keywords": ["lit", "web-components", "game", "real-housewives", "family-drama", "admin", "development"],
+  "author": "Andre",
   "license": "MIT"
 }
