@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Floating Butterflies & Waterfall</title>
+    <title>Melissa's Adventure: Escape from Sōl</title>
     <style>
         * {
             margin: 0;
@@ -927,7 +927,7 @@
                 const gameOverScreen = document.getElementById('gameOver');
                 const gameOverText = document.getElementById('gameOverText');
                 
-                gameOverText.innerHTML = "🎉 CONGRATULATIONS! 🎉<br/>💅 Your AUNT has DISMISSED all cousins! 💅<br/>They've all been transformed!<br/>🏆 ULTIMATE FAMILY DRAMA! 🏆";
+                gameOverText.innerHTML = "CONGRATULATIONS!<br/>Your AUNT has DISMISSED all cousins!<br/>They've all been transformed!<br/>ULTIMATE FAMILY DRAMA!";
                 gameOverScreen.classList.add('show');
             }, 3000);
         }
@@ -1128,8 +1128,26 @@
             bubble.textContent = text;
             
             const rect = butterfly.getBoundingClientRect();
-            bubble.style.left = (rect.left + 30) + 'px';
-            bubble.style.top = (rect.top - 30) + 'px';
+            let bubbleX = rect.left + 30;
+            let bubbleY = rect.top - 30;
+            
+            // Check for collision with existing bubbles and remove overlapping ones
+            const existingBubbles = document.querySelectorAll('.gossip-bubble');
+            existingBubbles.forEach(existingBubble => {
+                const existingRect = existingBubble.getBoundingClientRect();
+                const distance = Math.sqrt(
+                    Math.pow(bubbleX - existingRect.left, 2) + 
+                    Math.pow(bubbleY - existingRect.top, 2)
+                );
+                
+                // If bubbles would overlap (within 100px), remove the existing one
+                if (distance < 100 && existingBubble.parentNode) {
+                    existingBubble.parentNode.removeChild(existingBubble);
+                }
+            });
+            
+            bubble.style.left = bubbleX + 'px';
+            bubble.style.top = bubbleY + 'px';
             
             document.body.appendChild(bubble);
             
@@ -1165,8 +1183,8 @@
             cousin.classList.add('transforming');
             cousinsTransformed++;
             
-            // Aunt says "you're dismissed"
-            if (evilButterflyIndex !== -1) {
+            // Aunt says "you're dismissed" only 1/6 of the time
+            if (evilButterflyIndex !== -1 && Math.random() < 1/6) {
                 const aunt = butterflies[evilButterflyIndex];
                 if (aunt) {
                     showGossipBubble(aunt, "You're dismissed");
@@ -1281,7 +1299,7 @@
                         aunt.classList.remove('shaking');
                     }, 3000);
                 }
-            }, 6000 + Math.random() * 4000); // Every 6-10 seconds
+            }, 3000 + Math.random() * 2000); // Every 3-5 seconds
         }
 
         function checkCollisions() {
