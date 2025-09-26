@@ -3,24 +3,13 @@
   "version": "1.0.0",
   "description": "Real Housewives Family Drama Simulator with Lit components",
   "type": "module",
-  "main": "intro-screen.html",
+  "main": "index.html",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
     "serve": "npx http-server . -p 8080 -c-1",
-    "old-dev": "node dev-server.js",
-    "start": "node dev-server.js"
+    "start": "npx http-server . -p 8080 -c-1"
   },
   "dependencies": {
-    "lit": "^3.1.0",
-    "express": "^4.18.2",
-    "cors": "^2.8.5"
-  },
-  "devDependencies": {
-    "vite": "^5.0.0",
-    "typescript": "^5.0.0",
-    "nodemon": "^3.0.1"
+    "lit": "^3.1.0"
   },
   "keywords": ["lit", "web-components", "game", "real-housewives", "family-drama", "admin", "development"],
   "author": "Andre",
