@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Housewives: Family Drama Simulator - Chat Admin Version</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Background and waterfall */
+        .waterfall {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .bg-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('outdoors.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: brightness(0.8) contrast(1.1);
+            z-index: 1;
+        }
+
+        /* Butterfly base styling */
+        .butterfly {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            z-index: 10;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .butterfly:hover {
+            transform: scale(1.3);
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) translateX(0px) rotate(0deg); 
+            }
+            25% { 
+                transform: translateY(-20px) translateX(10px) rotate(5deg); 
+            }
+            50% { 
+                transform: translateY(-10px) translateX(-15px) rotate(-3deg); 
+            }
+            75% { 
+                transform: translateY(-25px) translateX(5px) rotate(2deg); 
+            }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Aunt photo styling */
+        .aunt-butterfly {
+            width: 100px !important;
+            height: 100px !important;
+            background-image: url('myaunt.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            outline: none;
+            border: none;
+            box-shadow: none;
+            animation: wideErraticFloat 10s ease-in-out infinite !important;
+            z-index: 12 !important;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .aunt-butterfly.shaking {
+            animation: auntShakeIntense 0.15s ease-in-out infinite !important;
+        }
+
+        @keyframes auntShakeIntense {
+            0% { transform: translateX(0px) translateY(0px) rotate(0deg); }
+            10% { transform: translateX(-8px) translateY(-5px) rotate(-2deg); }
+            20% { transform: translateX(8px) translateY(5px) rotate(2deg); }
+            30% { transform: translateX(-6px) translateY(8px) rotate(-1deg); }
+            40% { transform: translateX(10px) translateY(-3px) rotate(3deg); }
+            50% { transform: translateX(-5px) translateY(-8px) rotate(-2deg); }
+            60% { transform: translateX(7px) translateY(6px) rotate(1deg); }
+            70% { transform: translateX(-9px) translateY(-2px) rotate(-3deg); }
+            80% { transform: translateX(6px) translateY(-7px) rotate(2deg); }
+            90% { transform: translateX(-4px) translateY(9px) rotate(-1deg); }
+            100% { transform: translateX(0px) translateY(0px) rotate(0deg); }
+        }
+
+        @keyframes wideErraticFloat {
+            0% { 
+                transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
+            }
+            20% { 
+                transform: translateY(-40px) translateX(60px) rotate(8deg) scale(1.05); 
+            }
+            40% { 
+                transform: translateY(-20px) translateX(-80px) rotate(-5deg) scale(0.95); 
+            }
+            60% { 
+                transform: translateY(-60px) translateX(70px) rotate(6deg) scale(1.02); 
+            }
+            80% { 
+                transform: translateY(-30px) translateX(-60px) rotate(-4deg) scale(0.98); 
+            }
+            100% { 
+                transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
+            }
+        }
+
+        /* Cousin styling */
+        .cousin {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            background-image: url('mycousin.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 10;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: cousinFloat 4s ease-in-out infinite;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .cousin:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255,255,255,0.4);
+        }
+
+        @keyframes cousinFloat {
+            0%, 100% { 
+                transform: translateY(0px) translateX(0px) rotate(0deg); 
+            }
+            25% { 
+                transform: translateY(-20px) translateX(10px) rotate(5deg); 
+            }
+            50% { 
+                transform: translateY(-10px) translateX(-15px) rotate(-3deg); 
+            }
+            75% { 
+                transform: translateY(-25px) translateX(5px) rotate(2deg); 
+            }
+        }
+
+        /* Gossip bubble styling */
+        .gossip-bubble {
+            position: absolute;
+            background: rgba(32, 32, 32, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #ffffff;
+            z-index: 100;
+            animation: gossipFloat 2s ease-out forwards;
+            pointer-events: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .gossip-bubble.aunt-quote {
+            background: linear-gradient(135deg, #1a1a1a, #333333);
+            border: 2px solid #d4af37;
+            color: #f5f5dc;
+            font-family: 'Times New Roman', serif;
+            font-size: 15px;
+            font-weight: 600;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            box-shadow: 0 6px 25px rgba(212,175,55,0.4);
+            min-width: 140px;
+        }
+
+        @keyframes gossipFloat {
+            0% { 
+                opacity: 0;
+                transform: scale(0.5) translateY(0px);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1) translateY(-20px);
+            }
+            100% { 
+                opacity: 0;
+                transform: scale(0.8) translateY(-40px);
+            }
+        }
+
+        /* Timer display */
+        .timer {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #f5f5f5;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+            z-index: 20;
+            background: rgba(20, 20, 20, 0.8);
+            padding: 12px 18px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.15);
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
+
+        /* Chat Admin Info */
+        .chat-admin-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #8b4513, #a0522d);
+            color: #ffffff;
+            border: 1px solid rgba(160, 82, 45, 0.3);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 1001;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            max-width: 200px;
+            text-align: center;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(139, 69, 19, 0.5); }
+            50% { box-shadow: 0 0 15px rgba(139, 69, 19, 0.8); }
+        }
+
+
+
+        /* Game over and victory screens */
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 15, 0.95);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #f5f5f5;
+            font-size: clamp(22px, 4vw, 42px);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease-in-out;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            overflow-y: auto;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 300;
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+        }
+
+        .game-over.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .game-over button {
+            margin-top: 24px;
+            padding: 14px 28px;
+            font-size: clamp(15px, 3.5vw, 20px);
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: #ecf0f1;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .game-over button:hover {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            border: 1px solid rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .admin-content {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .control-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Image Layer -->
+    <div class="waterfall">
+        <div class="bg-image"></div>
+    </div>
+
+    <!-- Timer Display -->
+    <div class="timer" id="timer">Cousins remaining: 8</div>
+
+    <!-- Chat Admin Info -->
+    <div class="chat-admin-info">💬 Chat Admin Mode - Ask GitHub Copilot to modify settings!</div>
+
+    <!-- Game Over Screen -->
+    <div class="game-over" id="gameOver">
+        <div id="gameOverText">You didn't click fast enough!</div>
+        <button onclick="restartGame()">Try Again</button>
+    </div>
+
+
+
+    <!-- Audio elements -->
+    <audio id="trumpetSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBzuZ3/LNeyUFl5vb8sGFTwsOGb/n9rJlFglJk/v1vWwyByKA3vq0hyYMIYHK7dt+OAGUkvv3t2Y0CBGUx+7VgkIFKHnJ7N2ARwMG" type="audio/wav">
+    </audio>
+
+    <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.1/dist/dotlottie-wc.js" type="module"></script>
+    
+    <script>
+        // Game configuration
+        let gameConfig = {
+            auntSpeed: 5,
+            cousinCount: 8,
+            bubbleDuration: 5,
+            backgroundImage: 'outdoors.webp',
+            hoverElimination: true,
+            explosionEffect: true,
+            showSparkles: true,
+            auntStopsWhenSpeaking: true,
+            auntQuotes: [
+                "I'm the queen bee! 👑",
+                "I'm just being authentic!",
+                "I'm shaking. I'm physically shaking.",
+                "You're dismissed",
+                "Hi, Baby Gorgeous!"
+            ],
+            cousinQuotes: [
+                "I had to fire 30 employees.",
+                "The launch is cancelled.",
+                "I am more of a free spirit without the Holy Spirit",
+                "On my healing journey, I always travel first class",
+                "Stop weaponizing my trauma against me",
+                "I would never assume that Meredith has a dirty house",
+                "This rose isn't scared to handle a little prick",
+                "There's more bathtub fights coming",
+                "Have you heard of sōl?",
+                "Join my MLM!"
+            ]
+        };
+
+        // Game state
+        const butterflies = [];
+        const cousins = [];
+        let evilButterflyIndex = -1;
+        let isGameActive = true;
+        let isEvilMode = false;
+        let cousinsTransformed = 0;
+        let auntHasEntered = false;
+        let auntQuoteInterval = null;
+        let cousinQuoteIntervals = [];
+        let auntIsSpeaking = false;
+
+        // Load saved config from localStorage
+        function loadConfig() {
+            const saved = localStorage.getItem('melissaGameConfig');
+            if (saved) {
+                gameConfig = { ...gameConfig, ...JSON.parse(saved) };
+            }
+            updateUIFromConfig();
+        }
+
+        // Save config to localStorage
+        function saveConfig() {
+            localStorage.setItem('melissaGameConfig', JSON.stringify(gameConfig));
+        }
+
+        // Update UI elements from config
+        function updateUIFromConfig() {
+            document.getElementById('auntSpeed').value = gameConfig.auntSpeed;
+            document.getElementById('auntSpeedValue').textContent = gameConfig.auntSpeed;
+            document.getElementById('cousinCount').value = gameConfig.cousinCount;
+            document.getElementById('cousinCountValue').textContent = gameConfig.cousinCount;
+            document.getElementById('bubbleDuration').value = gameConfig.bubbleDuration;
+            document.getElementById('bubbleDurationValue').textContent = gameConfig.bubbleDuration;
+            document.getElementById('backgroundImage').value = gameConfig.backgroundImage;
+            document.getElementById('hoverElimination').checked = gameConfig.hoverElimination;
+            document.getElementById('explosionEffect').checked = gameConfig.explosionEffect;
+            document.getElementById('showSparkles').checked = gameConfig.showSparkles;
+            document.getElementById('auntStopsWhenSpeaking').checked = gameConfig.auntStopsWhenSpeaking;
+            
+            renderQuoteLists();
+        }
+
+        // Update config from UI
+        function updateConfigFromUI() {
+            gameConfig.auntSpeed = parseInt(document.getElementById('auntSpeed').value);
+            gameConfig.cousinCount = parseInt(document.getElementById('cousinCount').value);
+            gameConfig.bubbleDuration = parseInt(document.getElementById('bubbleDuration').value);
+            gameConfig.backgroundImage = document.getElementById('backgroundImage').value;
+            gameConfig.hoverElimination = document.getElementById('hoverElimination').checked;
+            gameConfig.explosionEffect = document.getElementById('explosionEffect').checked;
+            gameConfig.showSparkles = document.getElementById('showSparkles').checked;
+            gameConfig.auntStopsWhenSpeaking = document.getElementById('auntStopsWhenSpeaking').checked;
+        }
+
+        // Chat admin mode - settings controlled via VS Code chat
+
+        function showStatus(message, type) {
+            const status = document.getElementById('statusMessage');
+            status.textContent = message;
+            status.className = `status-message ${type}`;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+
+        function saveChanges() {
+            updateConfigFromUI();
+            saveConfig();
+            applyConfigToGame();
+            showStatus('✅ Changes saved successfully!', 'success');
+        }
+
+        function resetToDefaults() {
+            if (confirm('Reset all settings to defaults? This cannot be undone.')) {
+                gameConfig = {
+                    auntSpeed: 5,
+                    cousinCount: 8,
+                    bubbleDuration: 5,
+                    backgroundImage: 'outdoors.webp',
+                    hoverElimination: true,
+                    explosionEffect: true,
+                    showSparkles: true,
+                    auntStopsWhenSpeaking: true,
+                    auntQuotes: [
+                        "I'm the queen bee! 👑",
+                        "I'm just being authentic!",
+                        "I'm shaking. I'm physically shaking.",
+                        "You're dismissed",
+                        "Hi, Baby Gorgeous!"
+                    ],
+                    cousinQuotes: [
+                        "I had to fire 30 employees.",
+                        "The launch is cancelled.",
+                        "I am more of a free spirit without the Holy Spirit",
+                        "On my healing journey, I always travel first class",
+                        "Stop weaponizing my trauma against me",
+                        "I would never assume that Meredith has a dirty house",
+                        "This rose isn't scared to handle a little prick",
+                        "There's more bathtub fights coming",
+                        "Have you heard of sōl?",
+                        "Join my MLM!"
+                    ]
+                };
+                saveConfig();
+                updateUIFromConfig();
+                applyConfigToGame();
+                showStatus('🔄 Reset to defaults!', 'success');
+            }
+        }
+
+        function applyConfigToGame() {
+            // Apply background
+            const bgImage = document.querySelector('.bg-image');
+            if (gameConfig.backgroundImage === 'default') {
+                bgImage.style.backgroundImage = 'none';
+                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            } else {
+                bgImage.style.backgroundImage = `url('${gameConfig.backgroundImage}')`;
+                document.body.style.background = '';
+            }
+            
+            // Update timer display
+            updateTimerDisplay();
+        }
+
+        // Quote management
+        function renderQuoteLists() {
+            const auntList = document.getElementById('auntQuotesList');
+            const cousinList = document.getElementById('cousinQuotesList');
+            
+            auntList.innerHTML = gameConfig.auntQuotes.map((quote, index) => `
+                <div class="quote-item">
+                    <span>${quote}</span>
+                    <button onclick="removeAuntQuote(${index})">Remove</button>
+                </div>
+            `).join('');
+            
+            cousinList.innerHTML = gameConfig.cousinQuotes.map((quote, index) => `
+                <div class="quote-item">
+                    <span>${quote}</span>
+                    <button onclick="removeCousinQuote(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function addAuntQuote() {
+            const input = document.getElementById('newAuntQuote');
+            if (input.value.trim()) {
+                gameConfig.auntQuotes.push(input.value.trim());
+                input.value = '';
+                renderQuoteLists();
+            }
+        }
+
+        function removeAuntQuote(index) {
+            gameConfig.auntQuotes.splice(index, 1);
+            renderQuoteLists();
+        }
+
+        function addCousinQuote() {
+            const input = document.getElementById('newCousinQuote');
+            if (input.value.trim()) {
+                gameConfig.cousinQuotes.push(input.value.trim());
+                input.value = '';
+                renderQuoteLists();
+            }
+        }
+
+        function removeCousinQuote(index) {
+            gameConfig.cousinQuotes.splice(index, 1);
+            renderQuoteLists();
+        }
+
+        // Range slider updates
+        document.getElementById('auntSpeed').addEventListener('input', function(e) {
+            document.getElementById('auntSpeedValue').textContent = e.target.value;
+        });
+
+        document.getElementById('cousinCount').addEventListener('input', function(e) {
+            document.getElementById('cousinCountValue').textContent = e.target.value;
+        });
+
+        document.getElementById('bubbleDuration').addEventListener('input', function(e) {
+            document.getElementById('bubbleDurationValue').textContent = e.target.value;
+        });
+
+        // Game functions (core game logic from original)
+        function createCousin() {
+            const cousin = document.createElement('div');
+            cousin.className = 'cousin';
+            
+            cousin.style.left = Math.random() * (window.innerWidth - 60) + 'px';
+            cousin.style.top = Math.random() * (window.innerHeight - 60) + 'px';
+            
+            cousin.style.animationDuration = (3 + Math.random() * 2) + 's';
+            cousin.style.animationDelay = Math.random() * 1 + 's';
+            
+            document.body.appendChild(cousin);
+            cousins.push(cousin);
+
+            setTimeout(() => {
+                showGossipBubble(cousin, "Have you heard of sōl?");
+            }, 500);
+
+            cousin.addEventListener('click', function() {
+                if (!isGameActive || cousin.classList.contains('transforming')) return;
+                transformCousinToButterfly(cousin);
+            });
+
+            if (gameConfig.hoverElimination) {
+                cousin.addEventListener('mouseenter', function() {
+                    if (!isGameActive || cousin.classList.contains('transforming')) return;
+                    transformCousinToButterfly(cousin);
+                });
+            }
+
+            startCousinQuoteCycle(cousin);
+            return cousin;
+        }
+
+        function createButterfly() {
+            const butterfly = document.createElement('div');
+            butterfly.className = `butterfly floating`;
+            
+            butterfly.style.left = Math.random() * (window.innerWidth - 80) + 'px';
+            butterfly.style.top = Math.random() * (window.innerHeight - 80) + 'px';
+            
+            butterfly.style.animationDuration = (4 + Math.random() * 4) + 's';
+            butterfly.style.animationDelay = Math.random() * 2 + 's';
+
+            const lottieButterfly = document.createElement('dotlottie-wc');
+            lottieButterfly.setAttribute('src', 'https://lottie.host/ff8b8e58-bc7d-4e1d-a883-a4c8c028d9da/2nMrBFofQd.lottie');
+            lottieButterfly.setAttribute('autoplay', '');
+            lottieButterfly.setAttribute('loop', '');
+            lottieButterfly.style.width = '60px';
+            lottieButterfly.style.height = '60px';
+            lottieButterfly.style.pointerEvents = 'none';
+            
+            const colorFilters = [
+                'hue-rotate(0deg)',
+                'hue-rotate(60deg)',
+                'hue-rotate(120deg)',
+                'hue-rotate(180deg)',
+                'hue-rotate(240deg)',
+                'hue-rotate(300deg)'
+            ];
+            lottieButterfly.style.filter = colorFilters[Math.floor(Math.random() * colorFilters.length)];
+            
+            butterfly.appendChild(lottieButterfly);
+            document.body.appendChild(butterfly);
+            butterflies.push(butterfly);
+
+            butterfly.addEventListener('click', function() {
+                if (!isGameActive) return;
+                
+                const butterflyIndex = butterflies.indexOf(butterfly);
+                
+                if (butterflyIndex === evilButterflyIndex) {
+                    showGossipBubble(butterfly, "I'm the queen bee! 👑");
+                    createSparkles(butterfly);
+                }
+            });
+
+            return butterfly;
+        }
+
+        function createSparkles(butterfly) {
+            if (!gameConfig.showSparkles) return;
+            
+            for (let i = 0; i < 6; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.position = 'absolute';
+                sparkle.style.width = '4px';
+                sparkle.style.height = '4px';
+                sparkle.style.background = 'white';
+                sparkle.style.borderRadius = '50%';
+                sparkle.style.zIndex = '15';
+                sparkle.style.animation = 'sparkleAnim 3s ease-in-out infinite';
+                
+                const rect = butterfly.getBoundingClientRect();
+                sparkle.style.left = (rect.left + Math.random() * 40 - 10) + 'px';
+                sparkle.style.top = (rect.top + Math.random() * 30 - 10) + 'px';
+                sparkle.style.animationDelay = (i * 0.1) + 's';
+                
+                document.body.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 3000);
+            }
+        }
+
+        function createExplosionAnimation(x, y) {
+            if (!gameConfig.explosionEffect) return;
+            
+            const explosion = document.createElement('div');
+            explosion.style.position = 'absolute';
+            explosion.style.left = (x - 50) + 'px';
+            explosion.style.top = (y - 50) + 'px';
+            explosion.style.width = '100px';
+            explosion.style.height = '100px';
+            explosion.style.zIndex = '20';
+            explosion.style.pointerEvents = 'none';
+            
+            const img = document.createElement('img');
+            img.style.width = '100%';
+            img.style.height = '100%';
+            
+            document.body.appendChild(explosion);
+            explosion.appendChild(img);
+            
+            let frame = 0;
+            const maxFrames = 9;
+            
+            const animateExplosion = () => {
+                if (frame < maxFrames) {
+                    img.src = `Explosion/explosion0${frame}.png`;
+                    frame++;
+                    setTimeout(animateExplosion, 80);
+                } else {
+                    explosion.remove();
+                }
+            };
+            
+            animateExplosion();
+        }
+
+        function showGossipBubble(character, text) {
+            const bubble = document.createElement('div');
+            bubble.className = 'gossip-bubble';
+            
+            const isAunt = character.classList && character.classList.contains('aunt-butterfly');
+            if (isAunt) {
+                bubble.classList.add('aunt-quote');
+                auntIsSpeaking = true;
+            }
+            
+            bubble.textContent = text;
+            
+            const rect = character.getBoundingClientRect();
+            const characterCenterX = rect.left + rect.width / 2;
+            const characterTopY = rect.top;
+            
+            let bubbleX = characterCenterX - 75;
+            let bubbleY = characterTopY - 50;
+            
+            if (isAunt) {
+                bubbleY = characterTopY - 60;
+                bubbleX = characterCenterX - 85;
+            }
+            
+            bubbleX = Math.max(10, Math.min(window.innerWidth - 170, bubbleX));
+            bubbleY = Math.max(10, bubbleY);
+            
+            if (!character.id) {
+                character.id = 'speaker_' + Math.random().toString(36).substr(2, 9);
+            }
+            bubble.setAttribute('data-speaker-id', character.id);
+            
+            bubble.style.left = bubbleX + 'px';
+            bubble.style.top = bubbleY + 'px';
+            
+            document.body.appendChild(bubble);
+            
+            const duration = isAunt ? gameConfig.bubbleDuration * 1000 + 2000 : gameConfig.bubbleDuration * 1000;
+            setTimeout(() => {
+                if (bubble.parentNode) {
+                    bubble.parentNode.removeChild(bubble);
+                    if (isAunt) {
+                        auntIsSpeaking = false;
+                    }
+                }
+            }, duration);
+        }
+
+        function transformCousinToButterfly(cousin) {
+            cousin.classList.add('transforming');
+            cousinsTransformed++;
+            
+            if (evilButterflyIndex !== -1 && Math.random() < 1/6) {
+                const aunt = butterflies[evilButterflyIndex];
+                if (aunt) {
+                    showGossipBubble(aunt, "You're dismissed");
+                }
+            }
+            
+            stopCousinQuoteCycle(cousin);
+            
+            const rect = cousin.getBoundingClientRect();
+            createExplosionAnimation(rect.left + rect.width/2, rect.top + rect.height/2);
+            
+            setTimeout(() => {
+                if (cousin.parentNode) {
+                    cousin.parentNode.removeChild(cousin);
+                }
+                
+                const cousinIndex = cousins.indexOf(cousin);
+                if (cousinIndex > -1) {
+                    cousins.splice(cousinIndex, 1);
+                }
+                
+                const butterfly = createButterfly();
+                butterfly.style.left = rect.left + 'px';
+                butterfly.style.top = rect.top + 'px';
+                
+                if (cousins.length === 0) {
+                    setTimeout(() => {
+                        activateEvilMode();
+                    }, 1000);
+                }
+                
+                updateTimerDisplay();
+            }, 1200);
+        }
+
+        function startCousinQuoteCycle(cousin) {
+            const interval = setInterval(() => {
+                if (!cousin.parentNode || cousin.classList.contains('transforming')) {
+                    clearInterval(interval);
+                    return;
+                }
+                
+                if (Math.random() < 0.7) {
+                    const mlmQuotes = ["Have you heard of sōl?", "Join my MLM!", "This opportunity won't last forever!", "You could be your own boss!"];
+                    const allQuotes = [...mlmQuotes, ...mlmQuotes, ...gameConfig.cousinQuotes];
+                    const randomQuote = allQuotes[Math.floor(Math.random() * allQuotes.length)];
+                    showGossipBubble(cousin, randomQuote);
+                }
+            }, 2000 + Math.random() * 1500);
+            
+            cousinQuoteIntervals.push(interval);
+        }
+
+        function stopCousinQuoteCycle(cousin) {
+            cousinQuoteIntervals.forEach(interval => clearInterval(interval));
+        }
+
+        function startAuntQuoteCycle() {
+            if (auntQuoteInterval) clearInterval(auntQuoteInterval);
+            
+            auntQuoteInterval = setInterval(() => {
+                if (evilButterflyIndex === -1 || !isGameActive) return;
+                
+                const aunt = butterflies[evilButterflyIndex];
+                if (!aunt || !aunt.parentNode) return;
+                
+                if (Math.random() < 0.4) {
+                    const randomQuote = gameConfig.auntQuotes[Math.floor(Math.random() * gameConfig.auntQuotes.length)];
+                    showGossipBubble(aunt, randomQuote);
+                }
+                
+                if (Math.random() < 0.2) {
+                    aunt.classList.add('shaking');
+                    setTimeout(() => {
+                        showGossipBubble(aunt, "I'm shaking. I'm physically shaking.");
+                    }, 50);
+                    
+                    setTimeout(() => {
+                        aunt.classList.remove('shaking');
+                    }, 8000);
+                }
+            }, 4000 + Math.random() * 2000);
+        }
+
+        function selectEvilButterfly() {
+            if (butterflies.length > 0) {
+                evilButterflyIndex = Math.floor(Math.random() * butterflies.length);
+                const evilButterfly = butterflies[evilButterflyIndex];
+                evilButterfly.classList.add('aunt-butterfly');
+                
+                evilButterfly.style.animationDuration = (11 - gameConfig.auntSpeed) + 's';
+                
+                const centerX = (window.innerWidth - 100) / 2;
+                const centerY = (window.innerHeight - 100) / 2;
+                evilButterfly.style.left = centerX + 'px';
+                evilButterfly.style.top = centerY + 'px';
+                
+                if (!auntHasEntered) {
+                    auntHasEntered = true;
+                    setTimeout(() => {
+                        showGossipBubble(evilButterfly, "Hi, Baby Gorgeous!");
+                    }, 1000);
+                    
+                    setTimeout(() => {
+                        startAuntQuoteCycle();
+                    }, 2000);
+                }
+            }
+        }
+
+        function updateTimerDisplay() {
+            const timerElement = document.getElementById('timer');
+            timerElement.textContent = `Cousins remaining: ${cousins.length}`;
+        }
+
+        function activateEvilMode() {
+            isGameActive = false;
+            isEvilMode = true;
+            
+            document.getElementById('timer').style.display = 'none';
+            
+            playTrumpetSound();
+            
+            setTimeout(() => {
+                const gameOverScreen = document.getElementById('gameOver');
+                const gameOverText = document.getElementById('gameOverText');
+                
+                gameOverText.innerHTML = "CONGRATULATIONS!<br/>Your AUNT has DISMISSED all cousins!<br/>They've all been transformed!<br/>ULTIMATE FAMILY DRAMA!";
+                gameOverScreen.classList.add('show');
+            }, 3000);
+        }
+
+        function playTrumpetSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+            
+            notes.forEach((frequency, index) => {
+                setTimeout(() => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                    oscillator.type = 'square';
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                }, index * 150);
+            });
+        }
+
+        function restartGame() {
+            isGameActive = true;
+            isEvilMode = false;
+            evilButterflyIndex = -1;
+            cousinsTransformed = 0;
+            auntHasEntered = false;
+            
+            if (auntQuoteInterval) clearInterval(auntQuoteInterval);
+            cousinQuoteIntervals.forEach(interval => clearInterval(interval));
+            cousinQuoteIntervals = [];
+            
+            butterflies.forEach(butterfly => {
+                if (butterfly.parentNode) {
+                    butterfly.parentNode.removeChild(butterfly);
+                }
+            });
+            butterflies.length = 0;
+            
+            cousins.forEach(cousin => {
+                if (cousin.parentNode) {
+                    cousin.parentNode.removeChild(cousin);
+                }
+            });
+            cousins.length = 0;
+            
+            const gossipElements = document.querySelectorAll('.gossip-bubble');
+            gossipElements.forEach(bubble => {
+                if (bubble.parentNode) {
+                    bubble.parentNode.removeChild(bubble);
+                }
+            });
+            
+            document.getElementById('timer').style.display = 'block';
+            document.getElementById('gameOver').classList.remove('show');
+            
+            initializeGame();
+        }
+
+        function initializeGame() {
+            for (let i = 0; i < gameConfig.cousinCount; i++) {
+                setTimeout(() => {
+                    createCousin();
+                }, i * 200);
+            }
+            
+            setTimeout(() => {
+                createButterfly();
+                selectEvilButterfly();
+                updateTimerDisplay();
+            }, 2000);
+        }
+
+        // Initialize
+        loadConfig();
+        initializeGame();
+        
+        // Auto-save changes when sliders move
+        document.addEventListener('input', function(e) {
+            if (e.target.type === 'range' || e.target.type === 'checkbox' || e.target.tagName === 'SELECT') {
+                updateConfigFromUI();
+                saveConfig();
+                applyConfigToGame();
+            }
+        });
+
+        // Add sparkle animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes sparkleAnim {
+                0%, 100% { opacity: 0; transform: scale(0); }
+                50% { opacity: 1; transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
