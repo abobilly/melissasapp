@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melissa's Adventure - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .chat-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            color: #444;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px 10px 10px 0;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .range-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .range-group input[type="range"] {
+            flex: 1;
+        }
+
+        .range-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        /* Chat Interface */
+        .chat-history {
+            flex: 1;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+            background: white;
+            margin-bottom: 15px;
+            max-height: 400px;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .ai-message {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input textarea {
+            flex: 1;
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .chat-input button {
+            align-self: flex-end;
+            height: fit-content;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .quote-list {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .quote-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 3px;
+        }
+
+        .quote-item button {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel">
+            <h1>🎮 Melissa's Adventure Admin Panel</h1>
+            
+            <div class="section">
+                <h2>🎯 Game Controls</h2>
+                <div class="button-group">
+                    <button onclick="applyAllChanges()">💾 Apply All Changes</button>
+                    <button onclick="resetToDefaults()">🔄 Reset to Defaults</button>
+                    <button onclick="openGame()">🚀 Open Game</button>
+                    <button onclick="previewChanges()">👁️ Preview Changes</button>
+                </div>
+                <div id="status"></div>
+            </div>
+
+            <div class="section">
+                <h2>👩 Aunt Settings</h2>
+                
+                <div class="form-group">
+                    <label>Aunt Movement Speed</label>
+                    <div class="range-group">
+                        <input type="range" id="auntSpeed" min="1" max="10" value="5">
+                        <span class="range-value" id="auntSpeedValue">5</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Aunt Quote Frequency (seconds)</label>
+                    <div class="range-group">
+                        <input type="range" id="auntQuoteFreq" min="2" max="15" value="4">
+                        <span class="range-value" id="auntQuoteFreqValue">4</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Shaking Duration (seconds)</label>
+                    <div class="range-group">
+                        <input type="range" id="shakingDuration" min="3" max="15" value="8">
+                        <span class="range-value" id="shakingDurationValue">8</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Butterfly Attraction Range (pixels)</label>
+                    <div class="range-group">
+                        <input type="range" id="attractionRange" min="50" max="400" value="200">
+                        <span class="range-value" id="attractionRangeValue">200</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Cousin Repulsion Range (pixels)</label>
+                    <div class="range-group">
+                        <input type="range" id="repulsionRange" min="50" max="300" value="150">
+                        <span class="range-value" id="repulsionRangeValue">150</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="auntStopsWhenSpeaking" checked>
+                        <label for="auntStopsWhenSpeaking">Aunt stops moving when speaking</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>👥 Cousin Settings</h2>
+                
+                <div class="form-group">
+                    <label>MLM Dialogue Frequency (%)</label>
+                    <div class="range-group">
+                        <input type="range" id="mlmFrequency" min="10" max="100" value="70">
+                        <span class="range-value" id="mlmFrequencyValue">70</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Cousin Quote Interval (seconds)</label>
+                    <div class="range-group">
+                        <input type="range" id="cousinQuoteInterval" min="2" max="12" value="5">
+                        <span class="range-value" id="cousinQuoteIntervalValue">5</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="hoverElimination" checked>
+                        <label for="hoverElimination">Enable hover elimination</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="explosionEffect" checked>
+                        <label for="explosionEffect">Show explosion on transformation</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🦋 Butterfly Settings</h2>
+                
+                <div class="form-group">
+                    <label>Initial Butterfly Count</label>
+                    <div class="range-group">
+                        <input type="range" id="butterflyCount" min="5" max="30" value="15">
+                        <span class="range-value" id="butterflyCountValue">15</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Butterfly Movement Chance (%)</label>
+                    <div class="range-group">
+                        <input type="range" id="butterflyMovement" min="10" max="80" value="30">
+                        <span class="range-value" id="butterflyMovementValue">30</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>💬 Quote Management</h2>
+                
+                <div class="form-group">
+                    <label>Add New Aunt Quote</label>
+                    <textarea id="newAuntQuote" placeholder="Enter new aunt quote..." rows="2"></textarea>
+                    <button onclick="addAuntQuote()">Add Aunt Quote</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Add New Cousin Quote</label>
+                    <textarea id="newCousinQuote" placeholder="Enter new cousin quote..." rows="2"></textarea>
+                    <button onclick="addCousinQuote()">Add Cousin Quote</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Current Aunt Quotes</label>
+                    <div id="auntQuotesList" class="quote-list"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Current Cousin Quotes</label>
+                    <div id="cousinQuotesList" class="quote-list"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🎨 Visual Settings</h2>
+                
+                <div class="form-group">
+                    <label>Speech Bubble Duration (seconds)</label>
+                    <div class="range-group">
+                        <input type="range" id="bubbleDuration" min="1" max="8" value="3">
+                        <span class="range-value" id="bubbleDurationValue">3</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Background Image</label>
+                    <select id="backgroundImage">
+                        <option value="outdoors.webp">Outdoors Scene</option>
+                        <option value="custom">Upload Custom (TODO)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="showSparkles" checked>
+                        <label for="showSparkles">Show ambient sparkles</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel chat-panel">
+            <h2>💬 Chat with Assistant</h2>
+            <div class="chat-history" id="chatHistory">
+                <div class="chat-message ai-message">
+                    <strong>Assistant:</strong> Hi! I'm here to help you customize Melissa's Adventure. You can ask me about any changes you'd like to make, report issues, or get explanations about the game mechanics. What would you like to work on?
+                </div>
+            </div>
+            <div class="chat-input">
+                <textarea id="chatInput" placeholder="Ask me about game changes, report issues, or get help..."></textarea>
+                <button onclick="sendMessage()">Send</button>
+            </div>
+            <div class="button-group">
+                <button onclick="clearChat()">Clear Chat</button>
+                <button onclick="exportChat()">Export Chat</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game configuration object
+        let gameConfig = {
+            auntSpeed: 5,
+            auntQuoteFreq: 4,
+            shakingDuration: 8,
+            attractionRange: 200,
+            repulsionRange: 150,
+            auntStopsWhenSpeaking: true,
+            mlmFrequency: 70,
+            cousinQuoteInterval: 5,
+            hoverElimination: true,
+            explosionEffect: true,
+            butterflyCount: 15,
+            butterflyMovement: 30,
+            bubbleDuration: 3,
+            backgroundImage: 'outdoors.webp',
+            showSparkles: true,
+            auntQuotes: [
+                "I'm the queen bee! 👑",
+                "I'm just being authentic!",
+                "I'm shaking. I'm physically shaking.",
+                "You're dismissed",
+                "Hi, Baby Gorgeous!"
+            ],
+            cousinQuotes: [
+                "I had to fire 30 employees.",
+                "The launch is cancelled.",
+                "I am more of a free spirit without the Holy Spirit",
+                "On my healing journey, I always travel first class",
+                "Stop weaponizing my trauma against me",
+                "I would never assume that Meredith has a dirty house",
+                "This rose isn't scared to handle a little prick",
+                "There's more bathtub fights coming",
+                "Have you heard of sōl?",
+                "Join my MLM!"
+            ]
+        };
+
+        // Initialize UI
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfigToUI();
+            setupRangeListeners();
+            loadQuoteLists();
+            loadChatHistory();
+        });
+
+        function setupRangeListeners() {
+            const ranges = ['auntSpeed', 'auntQuoteFreq', 'shakingDuration', 'attractionRange', 'repulsionRange', 
+                          'mlmFrequency', 'cousinQuoteInterval', 'butterflyCount', 'butterflyMovement', 'bubbleDuration'];
+            
+            ranges.forEach(id => {
+                const range = document.getElementById(id);
+                const valueSpan = document.getElementById(id + 'Value');
+                
+                range.addEventListener('input', function() {
+                    valueSpan.textContent = this.value;
+                    gameConfig[id] = parseInt(this.value);
+                });
+            });
+        }
+
+        function loadConfigToUI() {
+            // Load all range values
+            Object.keys(gameConfig).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.type === 'range') {
+                        element.value = gameConfig[key];
+                        const valueSpan = document.getElementById(key + 'Value');
+                        if (valueSpan) valueSpan.textContent = gameConfig[key];
+                    } else if (element.type === 'checkbox') {
+                        element.checked = gameConfig[key];
+                    } else if (element.tagName === 'SELECT') {
+                        element.value = gameConfig[key];
+                    }
+                }
+            });
+        }
+
+        function loadQuoteLists() {
+            loadAuntQuotes();
+            loadCousinQuotes();
+        }
+
+        function loadAuntQuotes() {
+            const container = document.getElementById('auntQuotesList');
+            container.innerHTML = '';
+            gameConfig.auntQuotes.forEach((quote, index) => {
+                const item = document.createElement('div');
+                item.className = 'quote-item';
+                item.innerHTML = `
+                    <span>"${quote}"</span>
+                    <button onclick="removeAuntQuote(${index})">Remove</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function loadCousinQuotes() {
+            const container = document.getElementById('cousinQuotesList');
+            container.innerHTML = '';
+            gameConfig.cousinQuotes.forEach((quote, index) => {
+                const item = document.createElement('div');
+                item.className = 'quote-item';
+                item.innerHTML = `
+                    <span>"${quote}"</span>
+                    <button onclick="removeCousinQuote(${index})">Remove</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function addAuntQuote() {
+            const input = document.getElementById('newAuntQuote');
+            const quote = input.value.trim();
+            
+            if (quote) {
+                gameConfig.auntQuotes.push(quote);
+                input.value = '';
+                loadAuntQuotes();
+                showStatus('Aunt quote added successfully!', 'success');
+            }
+        }
+
+        function addCousinQuote() {
+            const input = document.getElementById('newCousinQuote');
+            const quote = input.value.trim();
+            
+            if (quote) {
+                gameConfig.cousinQuotes.push(quote);
+                input.value = '';
+                loadCousinQuotes();
+                showStatus('Cousin quote added successfully!', 'success');
+            }
+        }
+
+        function removeAuntQuote(index) {
+            gameConfig.auntQuotes.splice(index, 1);
+            loadAuntQuotes();
+            showStatus('Aunt quote removed!', 'success');
+        }
+
+        function removeCousinQuote(index) {
+            gameConfig.cousinQuotes.splice(index, 1);
+            loadCousinQuotes();
+            showStatus('Cousin quote removed!', 'success');
+        }
+
+        function applyAllChanges() {
+            // Update config from UI
+            updateConfigFromUI();
+            
+            // Here you would typically send the config to your backend
+            // For now, we'll just save to localStorage and show success
+            localStorage.setItem('melissaGameConfig', JSON.stringify(gameConfig));
+            showStatus('All changes applied successfully! 🎉', 'success');
+            
+            // Add to chat
+            addToChatHistory('User', 'Applied all configuration changes');
+            addToChatHistory('Assistant', 'Great! All your changes have been saved. The game will use these new settings when you next load it. Would you like me to explain any of the changes you made?');
+        }
+
+        function updateConfigFromUI() {
+            // Update checkboxes
+            gameConfig.auntStopsWhenSpeaking = document.getElementById('auntStopsWhenSpeaking').checked;
+            gameConfig.hoverElimination = document.getElementById('hoverElimination').checked;
+            gameConfig.explosionEffect = document.getElementById('explosionEffect').checked;
+            gameConfig.showSparkles = document.getElementById('showSparkles').checked;
+            
+            // Update select
+            gameConfig.backgroundImage = document.getElementById('backgroundImage').value;
+        }
+
+        function resetToDefaults() {
+            if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
+                // Reset to original config
+                gameConfig = {
+                    auntSpeed: 5,
+                    auntQuoteFreq: 4,
+                    shakingDuration: 8,
+                    attractionRange: 200,
+                    repulsionRange: 150,
+                    auntStopsWhenSpeaking: true,
+                    mlmFrequency: 70,
+                    cousinQuoteInterval: 5,
+                    hoverElimination: true,
+                    explosionEffect: true,
+                    butterflyCount: 15,
+                    butterflyMovement: 30,
+                    bubbleDuration: 3,
+                    backgroundImage: 'outdoors.webp',
+                    showSparkles: true,
+                    auntQuotes: [
+                        "I'm the queen bee! 👑",
+                        "I'm just being authentic!",
+                        "I'm shaking. I'm physically shaking.",
+                        "You're dismissed",
+                        "Hi, Baby Gorgeous!"
+                    ],
+                    cousinQuotes: [
+                        "I had to fire 30 employees.",
+                        "The launch is cancelled.",
+                        "I am more of a free spirit without the Holy Spirit",
+                        "On my healing journey, I always travel first class",
+                        "Stop weaponizing my trauma against me",
+                        "I would never assume that Meredith has a dirty house",
+                        "This rose isn't scared to handle a little prick",
+                        "There's more bathtub fights coming",
+                        "Have you heard of sōl?",
+                        "Join my MLM!"
+                    ]
+                };
+                
+                loadConfigToUI();
+                loadQuoteLists();
+                showStatus('Settings reset to defaults!', 'success');
+            }
+        }
+
+        function openGame() {
+            window.open('butterfly-waterfall.html', '_blank');
+        }
+
+        function previewChanges() {
+            updateConfigFromUI();
+            const changes = Object.keys(gameConfig).map(key => `${key}: ${gameConfig[key]}`).join('\n');
+            alert('Current Configuration:\n\n' + changes);
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+            
+            setTimeout(() => {
+                statusDiv.textContent = '';
+                statusDiv.className = '';
+            }, 3000);
+        }
+
+        // Chat functionality
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addToChatHistory('User', message);
+                input.value = '';
+                
+                // Simulate AI response (in a real implementation, this would call an API)
+                setTimeout(() => {
+                    const response = generateAIResponse(message);
+                    addToChatHistory('Assistant', response);
+                }, 1000);
+            }
+        }
+
+        function addToChatHistory(sender, message) {
+            const chatHistory = document.getElementById('chatHistory');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender.toLowerCase()}-message`;
+            messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatHistory.appendChild(messageDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            
+            // Save to localStorage
+            saveChatHistory();
+        }
+
+        function generateAIResponse(userMessage) {
+            const message = userMessage.toLowerCase();
+            
+            if (message.includes('aunt') && message.includes('speed')) {
+                return "You can adjust the aunt's movement speed using the 'Aunt Movement Speed' slider. Higher values make her move more frequently, while lower values make her more stationary.";
+            } else if (message.includes('cousin') && (message.includes('mlm') || message.includes('sol'))) {
+                return "The MLM dialogue frequency controls how often cousins mention sōl and MLM schemes. At 70%, they'll be quite chatty about it! You can adjust this with the 'MLM Dialogue Frequency' slider.";
+            } else if (message.includes('explosion')) {
+                return "The explosion effect plays when cousins transform into butterflies. It uses the PNG sequence you added to the Explosion folder. You can toggle this on/off with the checkbox.";
+            } else if (message.includes('quote')) {
+                return "You can add custom quotes for both aunt and cousins using the Quote Management section. Just type in new quotes and click 'Add'. You can also remove existing quotes.";
+            } else if (message.includes('help')) {
+                return "I can help you with:\n• Adjusting game mechanics (speeds, frequencies, ranges)\n• Managing quotes and dialogue\n• Explaining how different settings work\n• Troubleshooting issues\n• Adding new features\n\nWhat specific aspect would you like help with?";
+            } else if (message.includes('problem') || message.includes('issue') || message.includes('bug')) {
+                return "I'd be happy to help troubleshoot! Can you describe what's happening? Is it related to:\n• Character movement or behavior?\n• Dialogue or quotes not appearing?\n• Visual effects or animations?\n• Game performance?\n\nThe more details you provide, the better I can assist!";
+            } else {
+                return "Thanks for your message! I'm here to help with game customization. You can ask about adjusting settings, adding new quotes, explaining game mechanics, or reporting any issues you encounter. What would you like to work on?";
+            }
+        }
+
+        function clearChat() {
+            if (confirm('Clear all chat history?')) {
+                document.getElementById('chatHistory').innerHTML = `
+                    <div class="chat-message ai-message">
+                        <strong>Assistant:</strong> Hi! I'm here to help you customize Melissa's Adventure. You can ask me about any changes you'd like to make, report issues, or get explanations about the game mechanics. What would you like to work on?
+                    </div>
+                `;
+                localStorage.removeItem('melissaChatHistory');
+            }
+        }
+
+        function exportChat() {
+            const chatHistory = document.getElementById('chatHistory');
+            const messages = Array.from(chatHistory.children).map(div => div.textContent).join('\n\n');
+            
+            const blob = new Blob([messages], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'melissa-adventure-chat-' + new Date().toISOString().split('T')[0] + '.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function saveChatHistory() {
+            const chatHistory = document.getElementById('chatHistory');
+            localStorage.setItem('melissaChatHistory', chatHistory.innerHTML);
+        }
+
+        function loadChatHistory() {
+            const saved = localStorage.getItem('melissaChatHistory');
+            if (saved) {
+                document.getElementById('chatHistory').innerHTML = saved;
+            }
+        }
+
+        // Handle Enter key in chat
+        document.getElementById('chatInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
