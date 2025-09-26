@@ -1,4 +1,11 @@
 {
     "autoHide.autoHideSideBar": false,
-    "autoHide.autoHideAuxiliaryBar": false
+    "autoHide.autoHideAuxiliaryBar": false,
+    "terminal.integrated.env.windows": {
+        "GAME_API_KEY": "your_game_api_key_here",
+        "OPENAI_API_KEY": "your_openai_key_here"
+    },
+    "files.exclude": {
+        "**/.env": true
+    }
 }
