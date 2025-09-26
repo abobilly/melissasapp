@@ -838,17 +838,28 @@
             const maxX = window.innerWidth - (isAunt ? 100 : 60);
             const maxY = window.innerHeight - (isAunt ? 100 : 60);
             
-            // Keep aunt more centered to account for her wide movement pattern
-            const minBound = isAunt ? 200 : 0;
-            const maxBoundX = isAunt ? maxX - 200 : maxX;
-            const maxBoundY = isAunt ? maxY - 150 : maxY;
-            
-            const newX = minBound + Math.random() * (maxBoundX - minBound);
-            const newY = minBound/2 + Math.random() * (maxBoundY - minBound/2);
-            
-            butterfly.style.transition = 'all 3s ease-in-out';
-            butterfly.style.left = newX + 'px';
-            butterfly.style.top = newY + 'px';
+            if (isAunt) {
+                // Keep aunt in the middle third of the screen
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                const rangeX = window.innerWidth / 6; // ±1/6 of screen width from center
+                const rangeY = window.innerHeight / 6; // ±1/6 of screen height from center
+                
+                const newX = Math.max(50, Math.min(maxX, centerX - rangeX + Math.random() * (rangeX * 2)));
+                const newY = Math.max(50, Math.min(maxY, centerY - rangeY + Math.random() * (rangeY * 2)));
+                
+                butterfly.style.transition = 'all 3s ease-in-out';
+                butterfly.style.left = newX + 'px';
+                butterfly.style.top = newY + 'px';
+            } else {
+                // Regular butterflies can move anywhere
+                const newX = Math.random() * maxX;
+                const newY = Math.random() * maxY;
+                
+                butterfly.style.transition = 'all 3s ease-in-out';
+                butterfly.style.left = newX + 'px';
+                butterfly.style.top = newY + 'px';
+            }
         }
 
         function animateButterflies() {
@@ -1121,6 +1132,7 @@
             
             // Check if this is the aunt speaking
             const isAunt = butterfly.classList && butterfly.classList.contains('aunt-butterfly');
+            const isCousin = butterfly.classList && butterfly.classList.contains('cousin-butterfly');
             if (isAunt) {
                 bubble.classList.add('aunt-quote');
             }
@@ -1128,20 +1140,35 @@
             bubble.textContent = text;
             
             const rect = butterfly.getBoundingClientRect();
-            let bubbleX = rect.left + 30;
-            let bubbleY = rect.top - 30;
+            // Position bubble at the center-top of the character (their "head")
+            const characterCenterX = rect.left + rect.width / 2;
+            const characterTopY = rect.top;
+            
+            // Offset bubble to be above and slightly left of center for better readability
+            let bubbleX = characterCenterX - 50; // Center bubble on character, offset left a bit
+            let bubbleY = characterTopY - 40; // Place above the character's head
+            
+            // For aunt (larger image), adjust positioning
+            if (isAunt) {
+                bubbleY = characterTopY - 50; // More space above aunt
+            }
             
             // Check for collision with existing bubbles and remove overlapping ones
             const existingBubbles = document.querySelectorAll('.gossip-bubble');
             existingBubbles.forEach(existingBubble => {
                 const existingRect = existingBubble.getBoundingClientRect();
+                const existingCenterX = existingRect.left + existingRect.width / 2;
+                const existingCenterY = existingRect.top + existingRect.height / 2;
+                const newCenterX = bubbleX + 100; // Approximate bubble width center
+                const newCenterY = bubbleY + 30; // Approximate bubble height center
+                
                 const distance = Math.sqrt(
-                    Math.pow(bubbleX - existingRect.left, 2) + 
-                    Math.pow(bubbleY - existingRect.top, 2)
+                    Math.pow(newCenterX - existingCenterX, 2) + 
+                    Math.pow(newCenterY - existingCenterY, 2)
                 );
                 
-                // If bubbles would overlap (within 100px), remove the existing one
-                if (distance < 100 && existingBubble.parentNode) {
+                // If bubbles would overlap (within 120px), remove the existing one
+                if (distance < 120 && existingBubble.parentNode) {
                     existingBubble.parentNode.removeChild(existingBubble);
                 }
             });
@@ -1408,6 +1435,12 @@
                 
                 // Make aunt move much slower now
                 evilButterfly.style.animationDuration = '10s';
+                
+                // Move aunt to center immediately
+                const centerX = (window.innerWidth - 100) / 2;
+                const centerY = (window.innerHeight - 100) / 2;
+                evilButterfly.style.left = centerX + 'px';
+                evilButterfly.style.top = centerY + 'px';
                 
                 // Aunt entrance quote (only first time)
                 if (!auntHasEntered) {
