@@ -416,14 +416,21 @@
         }
 
         .aunt-butterfly.shaking {
-            animation: auntShake 0.6s ease-in-out infinite, wideErraticFloat 10s ease-in-out infinite !important;
+            animation: auntShakeIntense 0.15s ease-in-out infinite !important;
         }
 
-        @keyframes auntShake {
-            0%, 100% { transform: translateX(0px) translateY(0px); }
-            25% { transform: translateX(-3px) translateY(-2px); }
-            50% { transform: translateX(3px) translateY(2px); }
-            75% { transform: translateX(-2px) translateY(3px); }
+        @keyframes auntShakeIntense {
+            0% { transform: translateX(0px) translateY(0px) rotate(0deg); }
+            10% { transform: translateX(-8px) translateY(-5px) rotate(-2deg); }
+            20% { transform: translateX(8px) translateY(5px) rotate(2deg); }
+            30% { transform: translateX(-6px) translateY(8px) rotate(-1deg); }
+            40% { transform: translateX(10px) translateY(-3px) rotate(3deg); }
+            50% { transform: translateX(-5px) translateY(-8px) rotate(-2deg); }
+            60% { transform: translateX(7px) translateY(6px) rotate(1deg); }
+            70% { transform: translateX(-9px) translateY(-2px) rotate(-3deg); }
+            80% { transform: translateX(6px) translateY(-7px) rotate(2deg); }
+            90% { transform: translateX(-4px) translateY(9px) rotate(-1deg); }
+            100% { transform: translateX(0px) translateY(0px) rotate(0deg); }
         }
 
         .aunt-butterfly dotlottie-wc {
@@ -756,6 +763,13 @@
                 transformCousinToButterfly(cousin);
             });
 
+            // Add hover interaction - also transform cousin to butterfly
+            cousin.addEventListener('mouseenter', function() {
+                if (!isGameActive || cousin.classList.contains('transforming')) return;
+                
+                transformCousinToButterfly(cousin);
+            });
+
             // Start random quote cycle for this cousin
             startCousinQuoteCycle(cousin);
 
@@ -862,19 +876,51 @@
             }
         }
 
+        // Mouse tracking for aunt
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // Counter for less frequent non-aunt animations
+        let animationCounter = 0;
+
         function animateButterflies() {
+            animationCounter++;
+            
             butterflies.forEach(butterfly => {
-                if (Math.random() < 0.3) { // 30% chance to move
+                const isAunt = butterfly.classList.contains('aunt-butterfly');
+                if (isAunt) {
+                    // Aunt follows mouse cursor with some smoothing
+                    const currentX = parseInt(butterfly.style.left) || 0;
+                    const currentY = parseInt(butterfly.style.top) || 0;
+                    
+                    // Smooth following - move 20% of the way to mouse each frame
+                    const targetX = Math.max(0, Math.min(window.innerWidth - 100, mouseX - 50));
+                    const targetY = Math.max(0, Math.min(window.innerHeight - 100, mouseY - 50));
+                    
+                    const newX = currentX + (targetX - currentX) * 0.2;
+                    const newY = currentY + (targetY - currentY) * 0.2;
+                    
+                    butterfly.style.transition = 'none'; // Smooth real-time following
+                    butterfly.style.left = newX + 'px';
+                    butterfly.style.top = newY + 'px';
+                } else if (animationCounter % 80 === 0 && Math.random() < 0.3) { // Only every 4 seconds, 30% chance
                     moveButterfly(butterfly);
                 }
             });
             
-            // Also animate cousins
-            cousins.forEach(cousin => {
-                if (Math.random() < 0.4) { // 40% chance to move
-                    moveCousin(cousin);
-                }
-            });
+            // Also animate cousins (less frequently)
+            if (animationCounter % 80 === 0) {
+                cousins.forEach(cousin => {
+                    if (Math.random() < 0.4) { // 40% chance to move
+                        moveCousin(cousin);
+                    }
+                });
+            }
         }
 
         function moveCousin(cousin) {
@@ -1289,11 +1335,14 @@
                     return;
                 }
                 
-                if (Math.random() < 0.3) { // 30% chance every cycle
-                    const randomQuote = cousinRegularQuotes[Math.floor(Math.random() * cousinRegularQuotes.length)];
+                if (Math.random() < 0.7) { // 70% chance every cycle (more frequent)
+                    // Favor MLM/sōl quotes more heavily
+                    const mlmQuotes = ["Have you heard of sōl?", "Join my MLM!", "This opportunity won't last forever!", "You could be your own boss!"];
+                    const allQuotes = [...mlmQuotes, ...mlmQuotes, ...cousinRegularQuotes]; // Double MLM quotes for higher probability
+                    const randomQuote = allQuotes[Math.floor(Math.random() * allQuotes.length)];
                     showGossipBubble(cousin, randomQuote);
                 }
-            }, 8000 + Math.random() * 4000); // Every 8-12 seconds
+            }, 4000 + Math.random() * 2000); // Every 4-6 seconds (much more frequent)
             
             cousinQuoteIntervals.push(interval);
         }
@@ -1324,7 +1373,7 @@
                     
                     setTimeout(() => {
                         aunt.classList.remove('shaking');
-                    }, 3000);
+                    }, 8000); // Shake for 8 seconds when she says the shaking line!
                 }
             }, 3000 + Math.random() * 2000); // Every 3-5 seconds
         }
@@ -1477,7 +1526,7 @@
         initializeGame();
 
         // Periodically move butterflies
-        setInterval(animateButterflies, 4000);
+        setInterval(animateButterflies, 50); // Much more frequent for smooth mouse following
 
         // Check for collisions regularly
         setInterval(checkCollisions, 500);
