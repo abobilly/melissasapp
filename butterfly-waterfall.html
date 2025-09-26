@@ -409,7 +409,7 @@
             outline: none;
             border: none;
             box-shadow: none;
-            animation: wideErraticFloat 3s ease-in-out infinite !important;
+            animation: wideErraticFloat 6s ease-in-out infinite !important;
             z-index: 12 !important;
             /* Prevent tap highlight on mobile (which can look like a square) */
             -webkit-tap-highlight-color: transparent;
@@ -507,6 +507,71 @@
         .confetti-red { background: #FF6B6B; }
         .confetti-blue { background: #4ECDC4; }
         .confetti-green { background: #45B7D1; }
+
+        /* Cousin styling */
+        .cousin {
+            position: fixed;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            border-radius: 50%;
+            z-index: 10;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: cousinFloat 4s ease-in-out infinite;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .cousin:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255,107,157,0.4);
+        }
+
+        .cousin::before {
+            content: "👩";
+            font-size: 18px;
+        }
+
+        @keyframes cousinFloat {
+            0%, 100% { 
+                transform: translateY(0px) translateX(0px) rotate(0deg); 
+            }
+            25% { 
+                transform: translateY(-20px) translateX(10px) rotate(5deg); 
+            }
+            50% { 
+                transform: translateY(-10px) translateX(-15px) rotate(-3deg); 
+            }
+            75% { 
+                transform: translateY(-25px) translateX(5px) rotate(2deg); 
+            }
+        }
+
+        .cousin.transforming {
+            animation: cousinToButterflyTransform 1.2s ease-out forwards;
+        }
+
+        @keyframes cousinToButterflyTransform {
+            0% { 
+                transform: scale(1) rotate(0deg);
+                background: linear-gradient(135deg, #ff6b9d, #c44569);
+            }
+            50% { 
+                transform: scale(1.5) rotate(180deg);
+                background: linear-gradient(135deg, #ffd700, #ff8c00);
+                border-radius: 20px;
+            }
+            100% { 
+                transform: scale(0.8) rotate(360deg);
+                background: transparent;
+                border-radius: 50%;
+            }
+        }
 
         /* Gossip and Drama Effects */
         .gossip-bubble {
@@ -611,11 +676,38 @@
     <script>
         const colors = ['orange', 'blue', 'pink', 'purple', 'green'];
         const butterflies = [];
+        const cousins = [];
         let evilButterflyIndex = -1;
         let gameTimer = 15;
         let timerInterval = null;
         let isGameActive = true;
         let isEvilMode = false;
+        let cousinsTransformed = 0;
+
+        function createCousin() {
+            const cousin = document.createElement('div');
+            cousin.className = 'cousin';
+            
+            // Random starting position
+            cousin.style.left = Math.random() * (window.innerWidth - 60) + 'px';
+            cousin.style.top = Math.random() * (window.innerHeight - 60) + 'px';
+            
+            // Random animation duration and delay
+            cousin.style.animationDuration = (3 + Math.random() * 2) + 's';
+            cousin.style.animationDelay = Math.random() * 1 + 's';
+            
+            document.body.appendChild(cousin);
+            cousins.push(cousin);
+
+            // Add click interaction - transform cousin to butterfly
+            cousin.addEventListener('click', function() {
+                if (!isGameActive || cousin.classList.contains('transforming')) return;
+                
+                transformCousinToButterfly(cousin);
+            });
+
+            return cousin;
+        }
 
         function createButterfly() {
             const butterfly = document.createElement('div');
@@ -653,38 +745,17 @@
             document.body.appendChild(butterfly);
             butterflies.push(butterfly);
 
-            // Add click interaction
+            // Add click interaction only for aunt
             butterfly.addEventListener('click', function() {
                 if (!isGameActive) return;
                 
                 const butterflyIndex = butterflies.indexOf(butterfly);
                 
                 if (butterflyIndex === evilButterflyIndex) {
-                    // Clicked your aunt!
-                    activateEvilMode();
-                } else {
-                    // Normal butterfly click - check if near aunt for gossip
-                    if (evilButterflyIndex !== -1 && isNearAunt(butterfly)) {
-                        startGossipChain(butterfly);
-                    } else {
-                        createSparkles(butterfly);
-                    }
-                    
-                    resetTimer();
-                    
-                    // Change color filter on click for variety
-                    const lottieElement = butterfly.querySelector('dotlottie-wc');
-                    if (lottieElement) {
-                        const colorFilters = [
-                            'hue-rotate(0deg)',
-                            'hue-rotate(60deg)',
-                            'hue-rotate(120deg)',
-                            'hue-rotate(180deg)',
-                            'hue-rotate(240deg)',
-                            'hue-rotate(300deg)'
-                        ];
-                        lottieElement.style.filter = colorFilters[Math.floor(Math.random() * colorFilters.length)];
-                    }
+                    // Clicked your aunt! But now this doesn't end the game immediately
+                    // Just show aunt reaction
+                    showGossipBubble(butterfly, "I'm the queen bee! 👑");
+                    createSparkles(butterfly);
                 }
             });
 
@@ -733,48 +804,44 @@
                     moveButterfly(butterfly);
                 }
             });
+            
+            // Also animate cousins
+            cousins.forEach(cousin => {
+                if (Math.random() < 0.4) { // 40% chance to move
+                    moveCousin(cousin);
+                }
+            });
+        }
+
+        function moveCousin(cousin) {
+            const maxX = window.innerWidth - 60;
+            const maxY = window.innerHeight - 60;
+            
+            const newX = Math.random() * maxX;
+            const newY = Math.random() * maxY;
+            
+            cousin.style.left = newX + 'px';
+            cousin.style.top = newY + 'px';
         }
 
         function resetTimer() {
-            gameTimer = 15;
-            updateTimerDisplay();
+            // Timer removed - no time limit anymore
         }
 
         function updateTimerDisplay() {
+            // Show cousin count instead of timer
             const timerElement = document.getElementById('timer');
-            timerElement.textContent = `Time: ${gameTimer}s`;
-            
-            if (gameTimer <= 5) {
-                timerElement.classList.add('warning');
-            } else {
-                timerElement.classList.remove('warning');
-            }
+            timerElement.textContent = `Cousins remaining: ${cousins.length}`;
+            timerElement.classList.remove('warning'); // No warnings needed
         }
 
         function startTimer() {
-            if (timerInterval) clearInterval(timerInterval);
-            
-            timerInterval = setInterval(() => {
-                if (!isGameActive || isEvilMode) return;
-                
-                gameTimer--;
-                updateTimerDisplay();
-                
-                if (gameTimer <= 0) {
-                    gameOver();
-                }
-            }, 1000);
+            // No timer - game continues until all cousins are transformed
+            updateTimerDisplay();
         }
 
         function gameOver() {
-            isGameActive = false;
-            clearInterval(timerInterval);
-            
-            const gameOverScreen = document.getElementById('gameOver');
-            const gameOverText = document.getElementById('gameOverText');
-            
-            gameOverText.textContent = "You didn't click fast enough! Your aunt escaped!";
-            gameOverScreen.classList.add('show');
+            // Game over no longer needed - game ends when all cousins transformed
         }
 
         function activateEvilMode() {
@@ -807,7 +874,7 @@
                 const gameOverScreen = document.getElementById('gameOver');
                 const gameOverText = document.getElementById('gameOverText');
                 
-                gameOverText.innerHTML = "🎉 CONGRATULATIONS! 🎉<br/>💅 Your AUNT flipped the table! 💅<br/>All butterflies scattered in PANIC!<br/>🏆 DRAMA QUEEN VICTORY! 🏆";
+                gameOverText.innerHTML = "🎉 CONGRATULATIONS! 🎉<br/>💅 Your AUNT has DISMISSED all cousins! 💅<br/>They've all been transformed!<br/>🏆 ULTIMATE FAMILY DRAMA! 🏆";
                 gameOverScreen.classList.add('show');
             }, 3000);
         }
@@ -889,6 +956,7 @@
             isEvilMode = false;
             gameTimer = 15;
             evilButterflyIndex = -1;
+            cousinsTransformed = 0;
             
             // Clear all butterflies
             butterflies.forEach(butterfly => {
@@ -898,11 +966,27 @@
             });
             butterflies.length = 0;
             
+            // Clear all cousins
+            cousins.forEach(cousin => {
+                if (cousin.parentNode) {
+                    cousin.parentNode.removeChild(cousin);
+                }
+            });
+            cousins.length = 0;
+            
             // Clear confetti
             const confettiElements = document.querySelectorAll('.confetti');
             confettiElements.forEach(confetti => {
                 if (confetti.parentNode) {
                     confetti.parentNode.removeChild(confetti);
+                }
+            });
+            
+            // Clear gossip bubbles
+            const gossipElements = document.querySelectorAll('.gossip-bubble');
+            gossipElements.forEach(bubble => {
+                if (bubble.parentNode) {
+                    bubble.parentNode.removeChild(bubble);
                 }
             });
             
@@ -1011,6 +1095,47 @@
             oscillator.stop(audioContext.currentTime + 0.3);
         }
 
+        function transformCousinToButterfly(cousin) {
+            cousin.classList.add('transforming');
+            cousinsTransformed++;
+            
+            // Aunt says "you're dismissed"
+            if (evilButterflyIndex !== -1) {
+                const aunt = butterflies[evilButterflyIndex];
+                if (aunt) {
+                    showGossipBubble(aunt, "You're dismissed! 💅");
+                }
+            }
+            
+            // Transform animation
+            setTimeout(() => {
+                // Remove cousin and create butterfly in same position
+                const rect = cousin.getBoundingClientRect();
+                
+                if (cousin.parentNode) {
+                    cousin.parentNode.removeChild(cousin);
+                }
+                
+                // Remove from cousins array
+                const cousinIndex = cousins.indexOf(cousin);
+                if (cousinIndex > -1) {
+                    cousins.splice(cousinIndex, 1);
+                }
+                
+                // Create butterfly at same position
+                const butterfly = createButterfly();
+                butterfly.style.left = rect.left + 'px';
+                butterfly.style.top = rect.top + 'px';
+                
+                // Check if all cousins are transformed
+                if (cousins.length === 0) {
+                    setTimeout(() => {
+                        activateEvilMode();
+                    }, 1000);
+                }
+            }, 1200);
+        }
+
         function tableFlipScatter() {
             // Make all butterflies scatter to the edges in panic!
             butterflies.forEach((butterfly, index) => {
@@ -1069,26 +1194,25 @@
                 const evilButterfly = butterflies[evilButterflyIndex];
                 evilButterfly.classList.add('aunt-butterfly');
                 
-                // Make aunt move with a slower but wide animation
-                evilButterfly.style.animationDuration = '3s';
+                // Make aunt move much slower now
+                evilButterfly.style.animationDuration = '6s';
             }
         }
 
         function initializeGame() {
-            // Create initial butterflies
+            // Create initial cousins (instead of butterflies)
             for (let i = 0; i < 8; i++) {
                 setTimeout(() => {
-                    createButterfly();
-                    
-                    // After all butterflies are created, select the evil one
-                    if (i === 7) {
-                        setTimeout(() => {
-                            selectEvilButterfly();
-                            startTimer();
-                        }, 500);
-                    }
-                }, i * 500);
+                    createCousin();
+                }, i * 300);
             }
+            
+            // Create the aunt butterfly
+            setTimeout(() => {
+                createButterfly();
+                selectEvilButterfly();
+                startTimer(); // This now just updates the cousin counter
+            }, 2500);
         }
 
         // Start the game
@@ -1097,16 +1221,7 @@
         // Periodically move butterflies
         setInterval(animateButterflies, 4000);
 
-        // Add new butterfly occasionally (only if game is active and not in evil mode)
-        setInterval(() => {
-            if (isGameActive && !isEvilMode && butterflies.length < 12 && Math.random() < 0.5) {
-                createButterfly();
-                // Reassign evil butterfly if needed
-                if (evilButterflyIndex >= butterflies.length) {
-                    selectEvilButterfly();
-                }
-            }
-        }, 8000);
+        // No automatic butterfly spawning - only cousins transform to butterflies
 
         // Handle window resize
         window.addEventListener('resize', () => {
@@ -1119,6 +1234,18 @@
                 }
                 if (parseInt(butterfly.style.top) > maxY) {
                     butterfly.style.top = maxY + 'px';
+                }
+            });
+            
+            cousins.forEach(cousin => {
+                const maxX = window.innerWidth - 60;
+                const maxY = window.innerHeight - 60;
+                
+                if (parseInt(cousin.style.left) > maxX) {
+                    cousin.style.left = maxX + 'px';
+                }
+                if (parseInt(cousin.style.top) > maxY) {
+                    cousin.style.top = maxY + 'px';
                 }
             });
         });
