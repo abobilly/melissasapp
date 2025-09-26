@@ -258,8 +258,11 @@
                     <button onclick="resetToDefaults()">🔄 Reset to Defaults</button>
                     <button onclick="openGame()">🚀 Open Game</button>
                     <button onclick="previewChanges()">👁️ Preview Changes</button>
+                    <button onclick="refreshGameTab()">🔄 Refresh Game</button>
+                    <button onclick="generateConfigFile()">📄 Generate Config</button>
                 </div>
                 <div id="status"></div>
+                <div id="gameTabStatus" class="status" style="display: none;"></div>
             </div>
 
             <div class="section">
@@ -425,7 +428,22 @@
             <h2>💬 Chat with Assistant</h2>
             <div class="chat-history" id="chatHistory">
                 <div class="chat-message ai-message">
-                    <strong>Assistant:</strong> Hi! I'm here to help you customize Melissa's Adventure. You can ask me about any changes you'd like to make, report issues, or get explanations about the game mechanics. What would you like to work on?
+                    <strong>Assistant:</strong> 🎮 <strong>Welcome to Melissa's Adventure Admin Panel!</strong><br><br>
+                    
+                    <strong>📋 How to Use:</strong><br>
+                    1. Adjust settings using sliders and checkboxes<br>
+                    2. Click "Apply All Changes" to save<br>
+                    3. Click "Open Game" to test your changes<br>
+                    4. Use "Refresh Game" to reload after changes<br><br>
+                    
+                    <strong>💾 Important:</strong> This is a local admin panel. Settings save to your browser storage. For permanent changes, you'll need to modify the HTML file directly or use the "Generate Config" feature.<br><br>
+                    
+                    <strong>❓ Current Limitations:</strong><br>
+                    • Chat is simulated (not real AI)<br>
+                    • Changes don't auto-apply to game<br>
+                    • Manual refresh needed after changes<br><br>
+                    
+                    Ask me about game mechanics, settings explanations, or troubleshooting!
                 </div>
             </div>
             <div class="chat-input">
@@ -659,8 +677,71 @@
             }
         }
 
+        let gameWindow = null;
+
         function openGame() {
-            window.open('butterfly-waterfall.html', '_blank');
+            gameWindow = window.open('butterfly-waterfall.html', '_blank');
+            
+            if (gameWindow) {
+                showGameTabStatus('Game opened in new tab! 🎮', 'success');
+                
+                // Check if game tab is still open periodically
+                const checkInterval = setInterval(() => {
+                    if (gameWindow.closed) {
+                        showGameTabStatus('Game tab was closed', 'error');
+                        clearInterval(checkInterval);
+                        gameWindow = null;
+                    }
+                }, 2000);
+            } else {
+                showGameTabStatus('Could not open game tab. Please allow popups!', 'error');
+            }
+        }
+
+        function refreshGameTab() {
+            if (gameWindow && !gameWindow.closed) {
+                gameWindow.location.reload();
+                showGameTabStatus('Game tab refreshed! 🔄', 'success');
+            } else {
+                showGameTabStatus('No game tab open. Open game first!', 'error');
+            }
+        }
+
+        function showGameTabStatus(message, type) {
+            const statusDiv = document.getElementById('gameTabStatus');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 4000);
+        }
+
+        function generateConfigFile() {
+            updateConfigFromUI();
+            
+            const configJS = `
+// Auto-generated configuration for Melissa's Adventure
+// Generated on: ${new Date().toLocaleString()}
+
+const GAME_CONFIG = ${JSON.stringify(gameConfig, null, 2)};
+
+// Apply configuration to game
+if (typeof applyGameConfig === 'function') {
+    applyGameConfig(GAME_CONFIG);
+}
+`;
+            
+            const blob = new Blob([configJS], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'melissa-game-config.js';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showStatus('Configuration file generated! Add it to your HTML.', 'success');
         }
 
         function previewChanges() {
@@ -712,20 +793,26 @@
         function generateAIResponse(userMessage) {
             const message = userMessage.toLowerCase();
             
-            if (message.includes('aunt') && message.includes('speed')) {
-                return "You can adjust the aunt's movement speed using the 'Aunt Movement Speed' slider. Higher values make her move more frequently, while lower values make her more stationary.";
+            if (message.includes('how') && (message.includes('use') || message.includes('work'))) {
+                return "🔧 <strong>How to Use This Admin Panel:</strong><br><br>1. <strong>Make Changes:</strong> Use sliders, checkboxes, and text inputs<br>2. <strong>Apply Changes:</strong> Click 'Apply All Changes' to save<br>3. <strong>Test Game:</strong> Click 'Open Game' to open in new tab<br>4. <strong>Refresh:</strong> Use 'Refresh Game' after making changes<br><br><strong>💡 Pro Tip:</strong> The game needs to be refreshed to see your changes!";
+            } else if (message.includes('save') || message.includes('permanent')) {
+                return "💾 <strong>Saving Your Changes:</strong><br><br><strong>Current System:</strong> Settings save to browser localStorage (temporary)<br><br><strong>For Permanent Changes:</strong><br>1. Use 'Generate Config' to download a config file<br>2. Edit the HTML file directly in VS Code<br>3. Commit changes to Git<br><br><strong>⚠️ Note:</strong> Browser storage will reset if you clear browser data!";
+            } else if (message.includes('chat') || message.includes('real') || message.includes('connect')) {
+                return "💬 <strong>About This Chat:</strong><br><br><strong>Current:</strong> This is a simulated chat with pre-programmed responses<br><br><strong>For Real Help:</strong><br>• Ask questions in VS Code with GitHub Copilot<br>• Create GitHub issues for bugs<br>• Use the VS Code chat for live assistance<br><br>This chat is mainly for understanding how settings work!";
+            } else if (message.includes('refresh') || message.includes('update')) {
+                return "🔄 <strong>Refreshing & Updates:</strong><br><br><strong>After Making Changes:</strong><br>1. Click 'Apply All Changes'<br>2. Click 'Refresh Game' (if game tab is open)<br>3. Or close and reopen the game<br><br><strong>Auto-refresh:</strong> Not currently supported - manual refresh needed<br><br>The game tab status will show if refresh worked!";
+            } else if (message.includes('aunt') && message.includes('speed')) {
+                return "👩 <strong>Aunt Movement Speed:</strong><br><br>• <strong>1-3:</strong> Very slow, rarely moves<br>• <strong>4-6:</strong> Normal movement (default: 5)<br>• <strong>7-10:</strong> Very active, moves frequently<br><br>She also stops moving when speaking if that option is enabled!";
             } else if (message.includes('cousin') && (message.includes('mlm') || message.includes('sol'))) {
-                return "The MLM dialogue frequency controls how often cousins mention sōl and MLM schemes. At 70%, they'll be quite chatty about it! You can adjust this with the 'MLM Dialogue Frequency' slider.";
-            } else if (message.includes('explosion')) {
-                return "The explosion effect plays when cousins transform into butterflies. It uses the PNG sequence you added to the Explosion folder. You can toggle this on/off with the checkbox.";
+                return "👥 <strong>Cousin MLM Settings:</strong><br><br>• <strong>MLM Frequency:</strong> % chance they mention sōl/MLM<br>• <strong>Quote Interval:</strong> How often they speak<br>• <strong>Current:</strong> 70% chance every 5 seconds<br><br>Higher frequency = more MLM spam! 📈💸";
             } else if (message.includes('quote')) {
-                return "You can add custom quotes for both aunt and cousins using the Quote Management section. Just type in new quotes and click 'Add'. You can also remove existing quotes.";
+                return "💬 <strong>Quote Management:</strong><br><br>• <strong>Add:</strong> Type new quote, click Add button<br>• <strong>Remove:</strong> Click Remove next to existing quotes<br>• <strong>Apply:</strong> Changes take effect when you apply settings<br><br>You can customize all dialogue this way!";
+            } else if (message.includes('browser') || message.includes('vscode')) {
+                return "🌐 <strong>Browser vs VS Code:</strong><br><br><strong>Browser:</strong> Admin panel works in any browser<br><strong>VS Code:</strong> Edit HTML files directly<br><br><strong>Workflow:</strong><br>1. Use admin panel for quick testing<br>2. Use VS Code for permanent changes<br>3. Commit to Git for version control<br><br>Both approaches work together!";
             } else if (message.includes('help')) {
-                return "I can help you with:\n• Adjusting game mechanics (speeds, frequencies, ranges)\n• Managing quotes and dialogue\n• Explaining how different settings work\n• Troubleshooting issues\n• Adding new features\n\nWhat specific aspect would you like help with?";
-            } else if (message.includes('problem') || message.includes('issue') || message.includes('bug')) {
-                return "I'd be happy to help troubleshoot! Can you describe what's happening? Is it related to:\n• Character movement or behavior?\n• Dialogue or quotes not appearing?\n• Visual effects or animations?\n• Game performance?\n\nThe more details you provide, the better I can assist!";
+                return "❓ <strong>Available Help Topics:</strong><br><br>• <strong>'how to use'</strong> - Usage instructions<br>• <strong>'save permanent'</strong> - Making lasting changes<br>• <strong>'chat real'</strong> - About this chat system<br>• <strong>'refresh update'</strong> - How to update game<br>• <strong>'aunt speed'</strong> - Movement settings<br>• <strong>'cousin MLM'</strong> - Dialogue settings<br>• <strong>'browser vs vscode'</strong> - Workflow tips<br><br>What would you like to know about?";
             } else {
-                return "Thanks for your message! I'm here to help with game customization. You can ask about adjusting settings, adding new quotes, explaining game mechanics, or reporting any issues you encounter. What would you like to work on?";
+                return "🤖 I'm here to help explain the admin panel! Try asking:<br><br>• <strong>'How do I use this?'</strong><br>• <strong>'How do I save changes permanently?'</strong><br>• <strong>'How does the chat work?'</strong><br>• <strong>'How do I refresh the game?'</strong><br><br>Or ask about specific settings like aunt speed, cousin quotes, etc.!";
             }
         }
 
