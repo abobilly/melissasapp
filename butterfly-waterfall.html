@@ -409,14 +409,14 @@
             outline: none;
             border: none;
             box-shadow: none;
-            animation: wideErraticFloat 6s ease-in-out infinite !important;
+            animation: wideErraticFloat 10s ease-in-out infinite !important;
             z-index: 12 !important;
             /* Prevent tap highlight on mobile (which can look like a square) */
             -webkit-tap-highlight-color: transparent;
         }
 
         .aunt-butterfly.shaking {
-            animation: auntShake 0.6s ease-in-out infinite, wideErraticFloat 6s ease-in-out infinite !important;
+            animation: auntShake 0.6s ease-in-out infinite, wideErraticFloat 10s ease-in-out infinite !important;
         }
 
         @keyframes auntShake {
@@ -434,32 +434,17 @@
             0% { 
                 transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
             }
-            10% { 
-                transform: translateY(-80px) translateX(120px) rotate(25deg) scale(1.2); 
-            }
             20% { 
-                transform: translateY(-30px) translateX(-150px) rotate(-20deg) scale(0.8); 
-            }
-            30% { 
-                transform: translateY(-120px) translateX(90px) rotate(15deg) scale(1.1); 
+                transform: translateY(-40px) translateX(60px) rotate(8deg) scale(1.05); 
             }
             40% { 
-                transform: translateY(-50px) translateX(-180px) rotate(-30deg) scale(0.9); 
-            }
-            50% { 
-                transform: translateY(-100px) translateX(160px) rotate(10deg) scale(1.15); 
+                transform: translateY(-20px) translateX(-80px) rotate(-5deg) scale(0.95); 
             }
             60% { 
-                transform: translateY(-20px) translateX(-120px) rotate(-25deg) scale(0.85); 
-            }
-            70% { 
-                transform: translateY(-90px) translateX(140px) rotate(18deg) scale(1.05); 
+                transform: translateY(-60px) translateX(70px) rotate(6deg) scale(1.02); 
             }
             80% { 
-                transform: translateY(-60px) translateX(-100px) rotate(-12deg) scale(0.95); 
-            }
-            90% { 
-                transform: translateY(-110px) translateX(80px) rotate(22deg) scale(1.1); 
+                transform: translateY(-30px) translateX(-60px) rotate(-4deg) scale(0.98); 
             }
             100% { 
                 transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
@@ -605,6 +590,21 @@
             animation: gossipFloat 2s ease-out forwards;
             pointer-events: none;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Special styling for aunt's quotes */
+        .gossip-bubble.aunt-quote {
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            border: 3px solid #ff6347;
+            color: #8b0000;
+            font-family: 'Georgia', serif;
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(255,99,71,0.4);
+            min-width: 120px;
+            text-align: center;
         }
 
         @keyframes gossipFloat {
@@ -1118,6 +1118,13 @@
         function showGossipBubble(butterfly, text) {
             const bubble = document.createElement('div');
             bubble.className = 'gossip-bubble';
+            
+            // Check if this is the aunt speaking
+            const isAunt = butterfly.classList && butterfly.classList.contains('aunt-butterfly');
+            if (isAunt) {
+                bubble.classList.add('aunt-quote');
+            }
+            
             bubble.textContent = text;
             
             const rect = butterfly.getBoundingClientRect();
@@ -1130,7 +1137,7 @@
                 if (bubble.parentNode) {
                     bubble.parentNode.removeChild(bubble);
                 }
-            }, 2000);
+            }, isAunt ? 3000 : 2000); // Aunt's quotes stay longer
         }
 
         function playGossipSound() {
@@ -1382,7 +1389,7 @@
                 evilButterfly.classList.add('aunt-butterfly');
                 
                 // Make aunt move much slower now
-                evilButterfly.style.animationDuration = '6s';
+                evilButterfly.style.animationDuration = '10s';
                 
                 // Aunt entrance quote (only first time)
                 if (!auntHasEntered) {
@@ -1400,8 +1407,8 @@
         }
 
         function initializeGame() {
-            // Create way more initial cousins
-            for (let i = 0; i < 15; i++) {
+            // Create initial cousins (back to 8)
+            for (let i = 0; i < 8; i++) {
                 setTimeout(() => {
                     createCousin();
                 }, i * 200);
@@ -1412,7 +1419,7 @@
                 createButterfly();
                 selectEvilButterfly();
                 startTimer(); // This now just updates the cousin counter
-            }, 3500);
+            }, 2000);
         }
 
         // Start the game
