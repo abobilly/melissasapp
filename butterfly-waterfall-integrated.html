@@ -263,6 +263,138 @@
             50% { box-shadow: 0 0 15px rgba(139, 69, 19, 0.8); }
         }
 
+        /* Glassmorphism Card Styles */
+        .glassmorphism-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 300px;
+            width: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            background-color: rgba(223, 223, 223, 0.3);
+            border-radius: 20px;
+            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .glassmorphism-container.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .glassmorphism-container::after {
+            content: " ";
+            position: absolute;
+            height: 150px;
+            width: 150px;
+            left: 50%;
+            top: 25%;
+            transform: translateX(-100%);
+            background-image: linear-gradient(orange, magenta);
+            border-radius: 50%;
+            z-index: -1;
+            border: 2px solid #ffffffa6;
+            box-shadow: inset 10px 0px 20px #fff;
+            animation: glassAni 28s ease-in-out infinite;
+        }
+
+        .glassmorphism-container::before {
+            content: " ";
+            position: absolute;
+            height: 80px;
+            width: 80px;
+            left: 46%;
+            bottom: 25%;
+            transform: translateX(-100%);
+            background-image: linear-gradient(90deg, orange, magenta);
+            border-radius: 50%;
+            z-index: -1;
+            border: 2px solid #ffffffa6;
+            box-shadow: inset 10px 0px 20px #fff;
+        }
+
+        .glass-card {
+            width: 220px;
+            height: 280px;
+            border: 1px solid #ffffff56;
+            border-radius: 15px;
+            -webkit-backdrop-filter: blur(10.5px);
+            backdrop-filter: blur(10.5px);
+            padding: 20px;
+            position: relative;
+            box-shadow: inset 2px 1px 6px #ffffff45;
+            overflow: hidden;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card::after {
+            z-index: -1;
+            content: " ";
+            position: absolute;
+            width: 150%;
+            top: 0;
+            left: 0;
+            height: 10px;
+            background: #ffffff;
+            transform: rotateZ(50deg);
+            filter: blur(30px);
+            animation: glassShine 10s ease infinite;
+        }
+
+        .glass-inner-text {
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-image: linear-gradient(90deg, rgb(255, 255, 255), rgb(200, 200, 200));
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.2em;
+            margin: 10px 0px;
+            text-align: center;
+        }
+
+        .glass-desc {
+            padding: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        @keyframes glassAni {
+            0% {
+                transform: translateX(0%) scale(1);
+            }
+            50% {
+                transform: translateX(-100%) scale(0.8);
+            }
+            100% {
+                transform: translateX(0%) scale(1);
+            }
+        }
+
+        @keyframes glassShine {
+            0% {
+                top: 100%;
+                left: -100%;
+            }
+            50%,
+            100% {
+                top: 0%;
+                left: 70%;
+            }
+        }
+
 
 
         /* Game over and victory screens */
@@ -352,6 +484,14 @@
 
     <!-- Chat Admin Info -->
     <div class="chat-admin-info">💬 Chat Admin Mode - Ask GitHub Copilot to modify settings!</div>
+
+    <!-- Glassmorphism Card -->
+    <div class="glassmorphism-container" id="glassCard">
+        <div class="glass-card">
+            <div class="glass-inner-text" id="glassTitle">Special Message</div>
+            <div class="glass-desc" id="glassDesc">Something dramatic happened!</div>
+        </div>
+    </div>
 
     <!-- Game Over Screen -->
     <div class="game-over" id="gameOver">
@@ -456,6 +596,27 @@
         }
 
         // Chat admin mode - settings controlled via VS Code chat
+        
+        // Glassmorphism card functions
+        function showGlassCard(title, description, duration = 4000) {
+            const card = document.getElementById('glassCard');
+            const titleElement = document.getElementById('glassTitle');
+            const descElement = document.getElementById('glassDesc');
+            
+            titleElement.textContent = title;
+            descElement.textContent = description;
+            
+            card.classList.add('show');
+            
+            setTimeout(() => {
+                card.classList.remove('show');
+            }, duration);
+        }
+
+        function hideGlassCard() {
+            const card = document.getElementById('glassCard');
+            card.classList.remove('show');
+        }
 
         function showStatus(message, type) {
             const status = document.getElementById('statusMessage');
@@ -883,6 +1044,10 @@
                 
                 if (!auntHasEntered) {
                     auntHasEntered = true;
+                    
+                    // Show dramatic entrance card
+                    showGlassCard("🦋 AUNT HAS ENTERED", "The queen bee has arrived! Drama levels rising...", 3000);
+                    
                     setTimeout(() => {
                         showGossipBubble(evilButterfly, "Hi, Baby Gorgeous!");
                     }, 1000);
@@ -904,6 +1069,9 @@
             isEvilMode = true;
             
             document.getElementById('timer').style.display = 'none';
+            
+            // Show glassmorphism card for dramatic effect
+            showGlassCard("👑 AUNT MODE ACTIVATED", "All cousins have been dismissed! The queen bee reigns supreme!", 3000);
             
             playTrumpetSound();
             
