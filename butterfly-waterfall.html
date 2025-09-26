@@ -415,6 +415,17 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        .aunt-butterfly.shaking {
+            animation: auntShake 0.6s ease-in-out infinite, wideErraticFloat 6s ease-in-out infinite !important;
+        }
+
+        @keyframes auntShake {
+            0%, 100% { transform: translateX(0px) translateY(0px); }
+            25% { transform: translateX(-3px) translateY(-2px); }
+            50% { transform: translateX(3px) translateY(2px); }
+            75% { transform: translateX(-2px) translateY(3px); }
+        }
+
         .aunt-butterfly dotlottie-wc {
             display: none !important;
         }
@@ -508,33 +519,40 @@
         .confetti-blue { background: #4ECDC4; }
         .confetti-green { background: #45B7D1; }
 
-        /* Cousin styling */
+        /* Cousin styling - using mycousin.png */
         .cousin {
             position: fixed;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #ff6b9d, #c44569);
-            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            background-image: url('mycousin.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
             z-index: 10;
             cursor: pointer;
             transition: all 0.3s ease;
             animation: cousinFloat 4s ease-in-out infinite;
-            border: 2px solid #fff;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
+            /* No outline or glow to keep it clean */
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .cousin:hover {
             transform: scale(1.1);
-            box-shadow: 0 4px 15px rgba(255,107,157,0.4);
+            box-shadow: 0 4px 15px rgba(255,255,255,0.4);
         }
 
-        .cousin::before {
-            content: "👩";
-            font-size: 18px;
+        .cousin.shaking {
+            animation: cousinShake 0.5s ease-in-out infinite;
+        }
+
+        @keyframes cousinShake {
+            0%, 100% { transform: translateX(0px); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
         }
 
         @keyframes cousinFloat {
@@ -683,6 +701,33 @@
         let isGameActive = true;
         let isEvilMode = false;
         let cousinsTransformed = 0;
+        let auntHasEntered = false;
+        
+        // Aunt quotes
+        const auntRegularQuotes = [
+            "I am very important to God",
+            "If I give you a Chanel necklace and you choke on it, that's your problem, not mine.",
+            "Tornado. Spin the truth. Destroy!",
+            "I'm on play, all the time.",
+            "You want me to be your villain? I'll be your villain.",
+            "Middle class people don't have $60,000 rings. YES. THEY DO",
+            "I'm in 17C"
+        ];
+        
+        // Cousin quotes
+        const cousinRegularQuotes = [
+            "I had to fire 30 employees.",
+            "The launch is cancelled.",
+            "I am more of a free spirit without the Holy Spirit",
+            "On my healing journey, I always travel first class",
+            "Stop weaponizing my trauma against me",
+            "I would never assume that Meredith has a dirty house",
+            "This rose isn't scared to handle a little prick",
+            "There's more bathtub fights coming"
+        ];
+        
+        let auntQuoteInterval = null;
+        let cousinQuoteIntervals = [];
 
         function createCousin() {
             const cousin = document.createElement('div');
@@ -699,12 +744,20 @@
             document.body.appendChild(cousin);
             cousins.push(cousin);
 
+            // Special entrance quote
+            setTimeout(() => {
+                showGossipBubble(cousin, "Have you heard of sōl?");
+            }, 500);
+
             // Add click interaction - transform cousin to butterfly
             cousin.addEventListener('click', function() {
                 if (!isGameActive || cousin.classList.contains('transforming')) return;
                 
                 transformCousinToButterfly(cousin);
             });
+
+            // Start random quote cycle for this cousin
+            startCousinQuoteCycle(cousin);
 
             return cousin;
         }
@@ -957,6 +1010,12 @@
             gameTimer = 15;
             evilButterflyIndex = -1;
             cousinsTransformed = 0;
+            auntHasEntered = false;
+            
+            // Clear quote intervals
+            if (auntQuoteInterval) clearInterval(auntQuoteInterval);
+            cousinQuoteIntervals.forEach(interval => clearInterval(interval));
+            cousinQuoteIntervals = [];
             
             // Clear all butterflies
             butterflies.forEach(butterfly => {
@@ -1103,9 +1162,12 @@
             if (evilButterflyIndex !== -1) {
                 const aunt = butterflies[evilButterflyIndex];
                 if (aunt) {
-                    showGossipBubble(aunt, "You're dismissed! 💅");
+                    showGossipBubble(aunt, "You're dismissed");
                 }
             }
+            
+            // Stop quote cycle for this cousin
+            stopCousinQuoteCycle(cousin);
             
             // Transform animation
             setTimeout(() => {
@@ -1134,6 +1196,131 @@
                     }, 1000);
                 }
             }, 1200);
+        }
+
+        function transformButterflyToCousin(butterfly) {
+            // Create cousin at butterfly position
+            const rect = butterfly.getBoundingClientRect();
+            const newCousin = createCousin();
+            newCousin.style.left = rect.left + 'px';
+            newCousin.style.top = rect.top + 'px';
+            
+            // Special quote when butterfly becomes cousin
+            setTimeout(() => {
+                showGossipBubble(newCousin, "Have you heard of sōl?");
+            }, 300);
+            
+            // Remove butterfly
+            if (butterfly.parentNode) {
+                butterfly.parentNode.removeChild(butterfly);
+            }
+            
+            const butterflyIndex = butterflies.indexOf(butterfly);
+            if (butterflyIndex > -1) {
+                // If this was the aunt, we need to reassign
+                if (butterflyIndex === evilButterflyIndex) {
+                    evilButterflyIndex = -1;
+                    setTimeout(() => {
+                        selectEvilButterfly();
+                    }, 500);
+                }
+                butterflies.splice(butterflyIndex, 1);
+            }
+            
+            updateTimerDisplay();
+        }
+
+        function startCousinQuoteCycle(cousin) {
+            const interval = setInterval(() => {
+                if (!cousin.parentNode || cousin.classList.contains('transforming')) {
+                    clearInterval(interval);
+                    return;
+                }
+                
+                if (Math.random() < 0.3) { // 30% chance every cycle
+                    const randomQuote = cousinRegularQuotes[Math.floor(Math.random() * cousinRegularQuotes.length)];
+                    showGossipBubble(cousin, randomQuote);
+                }
+            }, 8000 + Math.random() * 4000); // Every 8-12 seconds
+            
+            cousinQuoteIntervals.push(interval);
+        }
+
+        function stopCousinQuoteCycle(cousin) {
+            // Clear intervals - not perfect but good enough for this use case
+            cousinQuoteIntervals.forEach(interval => clearInterval(interval));
+        }
+
+        function startAuntQuoteCycle() {
+            if (auntQuoteInterval) clearInterval(auntQuoteInterval);
+            
+            auntQuoteInterval = setInterval(() => {
+                if (evilButterflyIndex === -1 || !isGameActive) return;
+                
+                const aunt = butterflies[evilButterflyIndex];
+                if (!aunt || !aunt.parentNode) return;
+                
+                if (Math.random() < 0.4) { // 40% chance every cycle
+                    const randomQuote = auntRegularQuotes[Math.floor(Math.random() * auntRegularQuotes.length)];
+                    showGossipBubble(aunt, randomQuote);
+                }
+                
+                // Random shaking
+                if (Math.random() < 0.2) { // 20% chance to shake
+                    aunt.classList.add('shaking');
+                    showGossipBubble(aunt, "I'm shaking. I'm physically shaking.");
+                    
+                    setTimeout(() => {
+                        aunt.classList.remove('shaking');
+                    }, 3000);
+                }
+            }, 6000 + Math.random() * 4000); // Every 6-10 seconds
+        }
+
+        function checkCollisions() {
+            if (evilButterflyIndex === -1) return;
+            
+            const aunt = butterflies[evilButterflyIndex];
+            if (!aunt) return;
+            
+            const auntRect = aunt.getBoundingClientRect();
+            
+            // Check aunt touching butterflies
+            butterflies.forEach((butterfly, index) => {
+                if (index === evilButterflyIndex) return; // Skip aunt herself
+                
+                const butterflyRect = butterfly.getBoundingClientRect();
+                const distance = Math.sqrt(
+                    Math.pow(auntRect.left - butterflyRect.left, 2) + 
+                    Math.pow(auntRect.top - butterflyRect.top, 2)
+                );
+                
+                if (distance < 80) { // Within 80px is touching
+                    transformButterflyToCousin(butterfly);
+                }
+            });
+            
+            // Check cousins touching butterflies for MLM recruitment
+            cousins.forEach(cousin => {
+                const cousinRect = cousin.getBoundingClientRect();
+                
+                butterflies.forEach((butterfly, index) => {
+                    if (index === evilButterflyIndex) return; // Skip aunt
+                    
+                    const butterflyRect = butterfly.getBoundingClientRect();
+                    const distance = Math.sqrt(
+                        Math.pow(cousinRect.left - butterflyRect.left, 2) + 
+                        Math.pow(cousinRect.top - butterflyRect.top, 2)
+                    );
+                    
+                    if (distance < 70) { // Within 70px
+                        showGossipBubble(cousin, "Join my MLM!");
+                        setTimeout(() => {
+                            transformButterflyToCousin(butterfly);
+                        }, 800);
+                    }
+                });
+            });
         }
 
         function tableFlipScatter() {
@@ -1196,15 +1383,28 @@
                 
                 // Make aunt move much slower now
                 evilButterfly.style.animationDuration = '6s';
+                
+                // Aunt entrance quote (only first time)
+                if (!auntHasEntered) {
+                    auntHasEntered = true;
+                    setTimeout(() => {
+                        showGossipBubble(evilButterfly, "Hi, Baby Gorgeous!");
+                    }, 1000);
+                    
+                    // Start aunt quote cycle
+                    setTimeout(() => {
+                        startAuntQuoteCycle();
+                    }, 2000);
+                }
             }
         }
 
         function initializeGame() {
-            // Create initial cousins (instead of butterflies)
-            for (let i = 0; i < 8; i++) {
+            // Create way more initial cousins
+            for (let i = 0; i < 15; i++) {
                 setTimeout(() => {
                     createCousin();
-                }, i * 300);
+                }, i * 200);
             }
             
             // Create the aunt butterfly
@@ -1212,7 +1412,7 @@
                 createButterfly();
                 selectEvilButterfly();
                 startTimer(); // This now just updates the cousin counter
-            }, 2500);
+            }, 3500);
         }
 
         // Start the game
@@ -1220,6 +1420,9 @@
 
         // Periodically move butterflies
         setInterval(animateButterflies, 4000);
+
+        // Check for collisions regularly
+        setInterval(checkCollisions, 500);
 
         // No automatic butterfly spawning - only cousins transform to butterflies
 
