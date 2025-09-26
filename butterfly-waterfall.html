@@ -847,6 +847,39 @@
             }
         }
 
+        function createExplosionAnimation(x, y) {
+            const explosion = document.createElement('div');
+            explosion.style.position = 'absolute';
+            explosion.style.left = (x - 50) + 'px'; // Center the explosion
+            explosion.style.top = (y - 50) + 'px';
+            explosion.style.width = '100px';
+            explosion.style.height = '100px';
+            explosion.style.zIndex = '20';
+            explosion.style.pointerEvents = 'none';
+            
+            const img = document.createElement('img');
+            img.style.width = '100%';
+            img.style.height = '100%';
+            
+            document.body.appendChild(explosion);
+            explosion.appendChild(img);
+            
+            let frame = 0;
+            const maxFrames = 9; // explosion00.png through explosion08.png
+            
+            const animateExplosion = () => {
+                if (frame < maxFrames) {
+                    img.src = `Explosion/explosion0${frame}.png`;
+                    frame++;
+                    setTimeout(animateExplosion, 80); // Change frame every 80ms
+                } else {
+                    explosion.remove(); // Remove explosion when done
+                }
+            };
+            
+            animateExplosion();
+        }
+
         function moveButterfly(butterfly) {
             const isAunt = butterfly.classList.contains('aunt-butterfly');
             const maxX = window.innerWidth - (isAunt ? 100 : 60);
@@ -876,47 +909,75 @@
             }
         }
 
-        // Mouse tracking for aunt
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
-        
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        });
-
         // Counter for less frequent non-aunt animations
         let animationCounter = 0;
+        let auntIsSpeaking = false;
 
         function animateButterflies() {
             animationCounter++;
             
+            // Get aunt position for attraction/repulsion
+            const aunt = butterflies.find(b => b.classList.contains('aunt-butterfly'));
+            let auntRect = null;
+            if (aunt) {
+                auntRect = aunt.getBoundingClientRect();
+            }
+            
             butterflies.forEach(butterfly => {
                 const isAunt = butterfly.classList.contains('aunt-butterfly');
                 if (isAunt) {
-                    // Aunt follows mouse cursor with some smoothing
-                    const currentX = parseInt(butterfly.style.left) || 0;
-                    const currentY = parseInt(butterfly.style.top) || 0;
+                    // Aunt moves normally but stops/hovers when speaking
+                    if (!auntIsSpeaking && animationCounter % 80 === 0 && Math.random() < 0.3) {
+                        moveButterfly(butterfly);
+                    }
+                } else if (animationCounter % 20 === 0) { // Check attraction every second
+                    // Regular butterflies are attracted to aunt
+                    if (auntRect) {
+                        const butterflyRect = butterfly.getBoundingClientRect();
+                        const distance = Math.sqrt(
+                            Math.pow(auntRect.left - butterflyRect.left, 2) + 
+                            Math.pow(auntRect.top - butterflyRect.top, 2)
+                        );
+                        
+                        if (distance < 200 && distance > 50) {
+                            // Move butterfly closer to aunt
+                            const targetX = auntRect.left - 30 + Math.random() * 60;
+                            const targetY = auntRect.top - 30 + Math.random() * 60;
+                            
+                            butterfly.style.transition = 'all 2s ease-in-out';
+                            butterfly.style.left = Math.max(0, Math.min(window.innerWidth - 60, targetX)) + 'px';
+                            butterfly.style.top = Math.max(0, Math.min(window.innerHeight - 60, targetY)) + 'px';
+                        }
+                    }
                     
-                    // Smooth following - move 20% of the way to mouse each frame
-                    const targetX = Math.max(0, Math.min(window.innerWidth - 100, mouseX - 50));
-                    const targetY = Math.max(0, Math.min(window.innerHeight - 100, mouseY - 50));
-                    
-                    const newX = currentX + (targetX - currentX) * 0.2;
-                    const newY = currentY + (targetY - currentY) * 0.2;
-                    
-                    butterfly.style.transition = 'none'; // Smooth real-time following
-                    butterfly.style.left = newX + 'px';
-                    butterfly.style.top = newY + 'px';
-                } else if (animationCounter % 80 === 0 && Math.random() < 0.3) { // Only every 4 seconds, 30% chance
-                    moveButterfly(butterfly);
+                    if (animationCounter % 80 === 0 && Math.random() < 0.3) { // Also normal movement chance
+                        moveButterfly(butterfly);
+                    }
                 }
             });
             
-            // Also animate cousins (less frequently)
-            if (animationCounter % 80 === 0) {
+            // Handle cousin repulsion and movement
+            if (animationCounter % 20 === 0) { // Check repulsion every second
                 cousins.forEach(cousin => {
-                    if (Math.random() < 0.4) { // 40% chance to move
+                    if (auntRect) {
+                        const cousinRect = cousin.getBoundingClientRect();
+                        const distance = Math.sqrt(
+                            Math.pow(auntRect.left - cousinRect.left, 2) + 
+                            Math.pow(auntRect.top - cousinRect.top, 2)
+                        );
+                        
+                        if (distance < 150) {
+                            // Repel cousin away from aunt
+                            const repelX = cousinRect.left + (cousinRect.left - auntRect.left) * 0.5;
+                            const repelY = cousinRect.top + (cousinRect.top - auntRect.top) * 0.5;
+                            
+                            cousin.style.transition = 'all 1.5s ease-out';
+                            cousin.style.left = Math.max(0, Math.min(window.innerWidth - 60, repelX)) + 'px';
+                            cousin.style.top = Math.max(0, Math.min(window.innerHeight - 60, repelY)) + 'px';
+                        }
+                    }
+                    
+                    if (animationCounter % 80 === 0 && Math.random() < 0.4) { // Normal movement
                         moveCousin(cousin);
                     }
                 });
@@ -1181,6 +1242,7 @@
             const isCousin = butterfly.classList && butterfly.classList.contains('cousin-butterfly');
             if (isAunt) {
                 bubble.classList.add('aunt-quote');
+                auntIsSpeaking = true; // Set speaking state
             }
             
             bubble.textContent = text;
@@ -1215,6 +1277,10 @@
                 
                 // If bubbles would overlap (within 120px), remove the existing one
                 if (distance < 120 && existingBubble.parentNode) {
+                    // Check if we're removing an aunt bubble
+                    if (existingBubble.classList.contains('aunt-quote')) {
+                        auntIsSpeaking = false;
+                    }
                     existingBubble.parentNode.removeChild(existingBubble);
                 }
             });
@@ -1227,6 +1293,9 @@
             setTimeout(() => {
                 if (bubble.parentNode) {
                     bubble.parentNode.removeChild(bubble);
+                    if (isAunt) {
+                        auntIsSpeaking = false; // Clear speaking state when aunt's bubble disappears
+                    }
                 }
             }, isAunt ? 3000 : 2000); // Aunt's quotes stay longer
         }
@@ -1267,10 +1336,13 @@
             // Stop quote cycle for this cousin
             stopCousinQuoteCycle(cousin);
             
+            // Show explosion animation immediately
+            const rect = cousin.getBoundingClientRect();
+            createExplosionAnimation(rect.left + rect.width/2, rect.top + rect.height/2);
+            
             // Transform animation
             setTimeout(() => {
                 // Remove cousin and create butterfly in same position
-                const rect = cousin.getBoundingClientRect();
                 
                 if (cousin.parentNode) {
                     cousin.parentNode.removeChild(cousin);
@@ -1369,7 +1441,10 @@
                 // Random shaking
                 if (Math.random() < 0.2) { // 20% chance to shake
                     aunt.classList.add('shaking');
-                    showGossipBubble(aunt, "I'm shaking. I'm physically shaking.");
+                    // Show the bubble immediately when shaking starts
+                    setTimeout(() => {
+                        showGossipBubble(aunt, "I'm shaking. I'm physically shaking.");
+                    }, 50); // Show almost immediately with shaking
                     
                     setTimeout(() => {
                         aunt.classList.remove('shaking');
@@ -1526,7 +1601,7 @@
         initializeGame();
 
         // Periodically move butterflies
-        setInterval(animateButterflies, 50); // Much more frequent for smooth mouse following
+        setInterval(animateButterflies, 100); // Reasonable frequency for attraction/repulsion
 
         // Check for collisions regularly
         setInterval(checkCollisions, 500);
