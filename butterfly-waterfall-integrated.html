@@ -51,6 +51,25 @@
             z-index: 10;
             cursor: pointer;
             transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .butterfly::before {
+            content: '\01F98B';
+            font-size: 46px;
+            line-height: 1;
+            display: block;
+            transform-origin: center;
+            animation: butterflyFlutter var(--flutter-duration, 0.85s) ease-in-out infinite alternate;
+            animation-delay: var(--flutter-delay, 0s);
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+        }
+
+        .aunt-butterfly::before {
+            content: none;
         }
 
         .butterfly:hover {
@@ -73,6 +92,12 @@
             }
         }
 
+        @keyframes butterflyFlutter {
+            0% { transform: rotate(-14deg) scale(0.96); }
+            50% { transform: rotate(10deg) scale(1.05); }
+            100% { transform: rotate(-12deg) scale(0.97); }
+        }
+
         .floating {
             animation: float 6s ease-in-out infinite;
         }
@@ -91,6 +116,7 @@
             animation: wideErraticFloat 10s ease-in-out infinite !important;
             z-index: 12 !important;
             -webkit-tap-highlight-color: transparent;
+            filter: none !important;
         }
 
         .aunt-butterfly.shaking {
@@ -599,8 +625,6 @@
     <audio id="trumpetSound" preload="auto">
         <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBzuZ3/LNeyUFl5vb8sGFTwsOGb/n9rJlFglJk/v1vWwyByKA3vq0hyYMIYHK7dt+OAGUkvv3t2Y0CBGUx+7VgkIFKHnJ7N2ARwMG" type="audio/wav">
     </audio>
-
-    <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.1/dist/dotlottie-wc.js" type="module"></script>
     
     <script>
         // Game configuration
@@ -888,14 +912,6 @@
             butterfly.style.animationDuration = (4 + Math.random() * 4) + 's';
             butterfly.style.animationDelay = Math.random() * 2 + 's';
 
-            const lottieButterfly = document.createElement('dotlottie-wc');
-            lottieButterfly.setAttribute('src', 'https://lottie.host/ff8b8e58-bc7d-4e1d-a883-a4c8c028d9da/2nMrBFofQd.lottie');
-            lottieButterfly.setAttribute('autoplay', '');
-            lottieButterfly.setAttribute('loop', '');
-            lottieButterfly.style.width = '60px';
-            lottieButterfly.style.height = '60px';
-            lottieButterfly.style.pointerEvents = 'none';
-            
             const colorFilters = [
                 'hue-rotate(0deg)',
                 'hue-rotate(60deg)',
@@ -904,9 +920,13 @@
                 'hue-rotate(240deg)',
                 'hue-rotate(300deg)'
             ];
-            lottieButterfly.style.filter = colorFilters[Math.floor(Math.random() * colorFilters.length)];
-            
-            butterfly.appendChild(lottieButterfly);
+            butterfly.style.filter = colorFilters[Math.floor(Math.random() * colorFilters.length)];
+
+            const flutterDuration = 0.75 + Math.random() * 0.4;
+            const flutterDelay = Math.random() * 0.6;
+            butterfly.style.setProperty('--flutter-duration', `${flutterDuration.toFixed(2)}s`);
+            butterfly.style.setProperty('--flutter-delay', `${flutterDelay.toFixed(2)}s`);
+
             document.body.appendChild(butterfly);
             butterflies.push(butterfly);
 
